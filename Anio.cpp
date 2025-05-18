@@ -1,0 +1,78 @@
+/***********************************************************************
+ * Module:  Anio.cpp
+ * Author:  mayo
+ * Modified: lunes, 28 de abril de 2025 12:05:21 a. m.
+ * Purpose: Implementation of the class Anio
+ ***********************************************************************/
+
+#include "Anio.h"
+
+////////////////////////////////////////////////////////////////////////
+// Name:       Anio::getAnioBisiesto()
+// Purpose:    Implementation of Anio::getAnioBisiesto()
+// Return:     bool
+////////////////////////////////////////////////////////////////////////
+
+bool Anio::getAnioBisiesto(void)
+{
+   return anioBisiesto;
+}
+
+////////////////////////////////////////////////////////////////////////
+// Name:       Anio::setAnioBisiesto(bool newAnioBisiesto)
+// Purpose:    Implementation of Anio::setAnioBisiesto()
+// Parameters:
+// - newAnioBisiesto
+// Return:     void
+////////////////////////////////////////////////////////////////////////
+
+void Anio::setAnioBisiesto(bool newAnioBisiesto)
+{
+   anioBisiesto = newAnioBisiesto;
+}
+
+////////////////////////////////////////////////////////////////////////
+// Name:       Anio::getAnio()
+// Purpose:    Implementation of Anio::getAnio()
+// Return:     int
+////////////////////////////////////////////////////////////////////////
+
+int Anio::getAnio(void)
+{
+   return anio;
+}
+
+////////////////////////////////////////////////////////////////////////
+// Name:       Anio::setAnio(int newAnio)
+// Purpose:    Implementation of Anio::setAnio()
+// Parameters:
+// - newAnio
+// Return:     void
+////////////////////////////////////////////////////////////////////////
+
+void Anio::setAnio(int newAnio)
+{
+   anio = newAnio;
+}
+
+////////////////////////////////////////////////////////////////////////
+// Name:       Anio::anio()
+// Purpose:    Implementation of Anio::anio()
+// Return:     void
+////////////////////////////////////////////////////////////////////////
+
+void Anio::iniciar(void)
+{
+   // TODO : implement
+}
+
+////////////////////////////////////////////////////////////////////////
+// Name:       Anio::finalize()
+// Purpose:    Implementation of Anio::finalize()
+// Return:     void
+////////////////////////////////////////////////////////////////////////
+
+void Anio::finalize(void)
+{
+   // TODO : implement
+}
