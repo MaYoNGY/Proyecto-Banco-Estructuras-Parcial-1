@@ -1,28 +1,27 @@
 /***********************************************************************
  * Module:  Anio.h
- * Author:  mayo
- * Modified: lunes, 28 de abril de 2025 12:05:21 a. m.
+ * Author:  camev
+ * Modified: sábado, 17 de mayo de 2025 21:22:42
  * Purpose: Declaration of the class Anio
  ***********************************************************************/
 
-#if !defined(__Class_Diagram_2_Anio_h)
-#define __Class_Diagram_2_Anio_h
+#if !defined(__Proyecto1_Anio_h)
+#define __Proyecto1_Anio_h
 
 class Anio
 {
 public:
-   bool getAnioBisiesto(void);
-   void setAnioBisiesto(bool newAnioBisiesto);
    int getAnio(void);
    void setAnio(int newAnio);
-   void iniciar(void);
+   bool getAnioBisiesto(void);
+   void setAnioBisiesto(bool newAnioBisiesto);
+   Anio();
+   ~Anio();
 
 protected:
-   void finalize(void);
-
 private:
-   bool anioBisiesto;
    int anio;
+   bool anioBisiesto;
 
 
 };

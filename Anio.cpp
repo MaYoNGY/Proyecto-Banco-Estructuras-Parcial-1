@@ -1,35 +1,11 @@
 /***********************************************************************
  * Module:  Anio.cpp
- * Author:  mayo
- * Modified: lunes, 28 de abril de 2025 12:05:21 a. m.
+ * Author:  camev
+ * Modified: sábado, 17 de mayo de 2025 21:22:42
  * Purpose: Implementation of the class Anio
  ***********************************************************************/
 
 #include "Anio.h"
-
-////////////////////////////////////////////////////////////////////////
-// Name:       Anio::getAnioBisiesto()
-// Purpose:    Implementation of Anio::getAnioBisiesto()
-// Return:     bool
-////////////////////////////////////////////////////////////////////////
-
-bool Anio::getAnioBisiesto(void)
-{
-   return anioBisiesto;
-}
-
-////////////////////////////////////////////////////////////////////////
-// Name:       Anio::setAnioBisiesto(bool newAnioBisiesto)
-// Purpose:    Implementation of Anio::setAnioBisiesto()
-// Parameters:
-// - newAnioBisiesto
-// Return:     void
-////////////////////////////////////////////////////////////////////////
-
-void Anio::setAnioBisiesto(bool newAnioBisiesto)
-{
-   anioBisiesto = newAnioBisiesto;
-}
 
 ////////////////////////////////////////////////////////////////////////
 // Name:       Anio::getAnio()
@@ -56,23 +32,46 @@ void Anio::setAnio(int newAnio)
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Name:       Anio::anio()
-// Purpose:    Implementation of Anio::anio()
-// Return:     void
+// Name:       Anio::getAnioBisiesto()
+// Purpose:    Implementation of Anio::getAnioBisiesto()
+// Return:     bool
 ////////////////////////////////////////////////////////////////////////
 
-void Anio::iniciar(void)
+bool Anio::getAnioBisiesto(void)
 {
-   // TODO : implement
+   return anioBisiesto;
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Name:       Anio::finalize()
-// Purpose:    Implementation of Anio::finalize()
+// Name:       Anio::setAnioBisiesto(bool newAnioBisiesto)
+// Purpose:    Implementation of Anio::setAnioBisiesto()
+// Parameters:
+// - newAnioBisiesto
 // Return:     void
 ////////////////////////////////////////////////////////////////////////
 
-void Anio::finalize(void)
+void Anio::setAnioBisiesto(bool newAnioBisiesto)
+{
+   anioBisiesto = newAnioBisiesto;
+}
+
+////////////////////////////////////////////////////////////////////////
+// Name:       Anio::Anio()
+// Purpose:    Implementation of Anio::Anio()
+// Return:     
+////////////////////////////////////////////////////////////////////////
+
+Anio::Anio()
+{
+}
+
+////////////////////////////////////////////////////////////////////////
+// Name:       Anio::~Anio()
+// Purpose:    Implementation of Anio::~Anio()
+// Return:     
+////////////////////////////////////////////////////////////////////////
+
+Anio::~Anio()
 {
    // TODO : implement
 }
