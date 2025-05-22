@@ -1,30 +1,103 @@
-/***********************************************************************
- * Module:  ListaCuenta.h
- * Author:  camev
- * Modified: sábado, 17 de mayo de 2025 21:08:05
- * Purpose: Declaration of the class ListaCuenta
- ***********************************************************************/
+#ifndef __LISTACUENTA_H
+#define __LISTACUENTA_H
+#include <iostream>
+#include <string>
+#include "NodoCuenta.h"
 
-#if !defined(__Proyecto1_ListaCuenta_h)
-#define __Proyecto1_ListaCuenta_h
-
-#include <NodoCuenta.h>
-#include <Cuenta.h>
-
+template <typename T>
 class ListaCuenta
 {
-public:
-   void insertarCuenta(Cuenta& cuenta);
-   NodoCuenta* buscarCuenta(int idCuenta, std::string nombre);
-   void mostrarCuentas(void);
-   void eliminarCuenta(int idCuenta);
-
-protected:
 private:
-   NodoCuenta* cabeza;
-   NodoCuenta* cola;
+   NodoCuenta<T>* cabeza;
+   NodoCuenta<T>* cola;
+public:
+   ListaCuenta() : cabeza(nullptr), cola(nullptr) {}
 
+   ~ListaCuenta() {
+      NodoCuenta<T>* actual = cabeza;
+      while (actual) {
+         NodoCuenta<T>* temp = actual;
+         actual = actual->getSiguiente();
+         delete temp;
+      }
+   }
 
+   void insertarCuenta(const T& cuenta) {
+      NodoCuenta<T>* nuevo = new NodoCuenta<T>(cuenta);
+      if (!cabeza) {
+         cabeza = cola = nuevo;
+         cabeza->setSiguiente(cabeza);
+         cabeza->setAnterior(cabeza);
+      } else {
+         cola->setSiguiente(nuevo);
+         nuevo->setAnterior(cola);
+         nuevo->setSiguiente(cabeza);
+         cola = nuevo;
+         cabeza->setAnterior(cola);
+      }
+   }
+
+   NodoCuenta<T>* buscarCuenta(int idCuenta, const std::string& nombre) {
+       if (!cabeza) {
+         std::cout << "No hay cuentas en la lista." << std::endl;
+         return;
+      }
+       NodoCuenta<T>* actual = cabeza;
+       do {
+           if (actual->getDato().getIdCuenta() == idCuenta && actual->getDato().getNombre() == nombre) {
+               return actual;
+           }
+           actual = actual->getSiguiente();
+       } while (actual != cabeza);
+       return nullptr;
+   }
+
+   void mostrarCuentas() const {
+      if (!cabeza) {
+         std::cout << "No hay cuentas en la lista." << std::endl;
+         return;
+      }
+      NodoCuenta<T>* actual = cabeza;
+      NodoCuenta<T>* actual = cabeza;
+      do {
+        std::cout << "ID: " << actual->getDato().getIdCuenta()
+                  << ", Nombre: " << actual->getDato().getNombre()
+                  << ", Saldo: " << actual->getDato().getSaldo()
+                  << ", Tipo: " << actual->getDato().getTipo().getTipo()
+                  << std::endl;
+        actual = actual->getSiguiente();
+    } while (actual != cabeza);
+   }
+
+   void eliminarCuenta(int idCuenta) {
+       if (!cabeza) {
+         std::cout << "No hay cuentas en la lista." << std::endl;
+         return;
+      }
+   
+       NodoCuenta<T>* actual = cabeza;
+       do {
+           if (actual->getDato().getIdCuenta() == idCuenta) {
+               if (actual == cabeza && actual == cola) {
+                   // Solo hay un nodo
+                   delete actual;
+                   cabeza = cola = nullptr;
+                   return;
+               }
+               if (actual == cabeza) {
+                   cabeza = cabeza->getSiguiente();
+               }
+               if (actual == cola) {
+                   cola = cola->getAnterior();
+               }
+               actual->getAnterior()->setSiguiente(actual->getSiguiente());
+               actual->getSiguiente()->setAnterior(actual->getAnterior());
+               delete actual;
+               return;
+           }
+           actual = actual->getSiguiente();
+       } while (actual != cabeza);
+   }
 };
 
 #endif

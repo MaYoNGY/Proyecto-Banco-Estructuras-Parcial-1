@@ -1,34 +1,31 @@
-/***********************************************************************
- * Module:  Fecha.h
- * Author:  camev
- * Modified: sábado, 17 de mayo de 2025 21:24:01
- * Purpose: Declaration of the class Fecha
- ***********************************************************************/
+#ifndef __FECHA_H
+#define __FECHA_H
 
-#if !defined(__Proyecto1_Fecha_h)
-#define __Proyecto1_Fecha_h
-
-#include <Anio.h>
+#include "Anio.h"
+#include "Validar.h"
 
 class Fecha
 {
 public:
-   Anio getAnio(void);
-   void setAnio(Anio newAnio);
-   int getMes(void);
-   void setMes(int newMes);
    int getDia(void);
    void setDia(int newDia);
-   Fecha();
-   ~Fecha();
+   int getMes(void);
+   void setMes(int newMes);
+   int getAnio(void);
+   void setAnio(int newAnio);
+   void fecha(void);
 
 protected:
+   void finalize(void);
+
 private:
-   Anio anio;
-   int mes;
    int dia;
+   int mes;
+   int anio;
 
-
+    bool validarFecha(int dia, int mes, int anio);
+    bool diaLaboral(int dia, int mes, int anio);
+    bool feriado(int dia, int mes, int anio);
 };
 
 #endif

@@ -1,123 +1,49 @@
-/***********************************************************************
- * Module:  Cuenta.cpp
- * Author:  camev
- * Modified: sábado, 17 de mayo de 2025 21:02:01
- * Purpose: Implementation of the class Cuenta
- ***********************************************************************/
-
 #include "Cuenta.h"
-
-////////////////////////////////////////////////////////////////////////
-// Name:       Cuenta::getIdCuenta()
-// Purpose:    Implementation of Cuenta::getIdCuenta()
-// Return:     int
-////////////////////////////////////////////////////////////////////////
+#include <string>
 
 int Cuenta::getIdCuenta(void)
 {
    return idCuenta;
 }
 
-////////////////////////////////////////////////////////////////////////
-// Name:       Cuenta::setIdCuenta(int newIdCuenta)
-// Purpose:    Implementation of Cuenta::setIdCuenta()
-// Parameters:
-// - newIdCuenta
-// Return:     void
-////////////////////////////////////////////////////////////////////////
-
 void Cuenta::setIdCuenta(int newIdCuenta)
 {
    idCuenta = newIdCuenta;
 }
 
-////////////////////////////////////////////////////////////////////////
-// Name:       Cuenta::getNombre()
-// Purpose:    Implementation of Cuenta::getNombre()
-// Return:     std::string
-////////////////////////////////////////////////////////////////////////
-
-std::string Cuenta::getNombre(void)
-{
-   return nombre;
+std::string Cuenta::getNombre(void) { 
+   return persona.getNombre(); 
 }
 
-////////////////////////////////////////////////////////////////////////
-// Name:       Cuenta::setNombre(std::string newNombre)
-// Purpose:    Implementation of Cuenta::setNombre()
-// Parameters:
-// - newNombre
-// Return:     void
-////////////////////////////////////////////////////////////////////////
-
-void Cuenta::setNombre(std::string newNombre)
-{
-   nombre = newNombre;
+void Cuenta::setNombre(std::string newNombre) { 
+   persona.setNombre(newNombre); 
 }
 
-////////////////////////////////////////////////////////////////////////
-// Name:       Cuenta::getSaldo()
-// Purpose:    Implementation of Cuenta::getSaldo()
-// Return:     double
-////////////////////////////////////////////////////////////////////////
+std::string Cuenta::getCedula(void) { 
+   return persona.getCedula(); 
+}
+
+void Cuenta::setCedula(std::string newCedula) { 
+   persona.setCedula(newCedula); 
+}
 
 double Cuenta::getSaldo(void)
 {
    return saldo;
 }
 
-////////////////////////////////////////////////////////////////////////
-// Name:       Cuenta::setSaldo(double newSaldo)
-// Purpose:    Implementation of Cuenta::setSaldo()
-// Parameters:
-// - newSaldo
-// Return:     void
-////////////////////////////////////////////////////////////////////////
-
 void Cuenta::setSaldo(double newSaldo)
 {
    saldo = newSaldo;
 }
 
-////////////////////////////////////////////////////////////////////////
-// Name:       Cuenta::Cuenta()
-// Purpose:    Implementation of Cuenta::Cuenta()
-// Return:     
-////////////////////////////////////////////////////////////////////////
-
-Cuenta::Cuenta()
-{
-}
-
-////////////////////////////////////////////////////////////////////////
-// Name:       Cuenta::~Cuenta()
-// Purpose:    Implementation of Cuenta::~Cuenta()
-// Return:     
-////////////////////////////////////////////////////////////////////////
-
-Cuenta::~Cuenta()
-{
-   // TODO : implement
-}
-
-////////////////////////////////////////////////////////////////////////
-// Name:       Cuenta::getTipo()
-// Purpose:    Implementation of Cuenta::getTipo()
-// Return:     TipoCuenta
-////////////////////////////////////////////////////////////////////////
+Cuenta::Cuenta(int id, const Persona& persona, double saldo, TipoCuenta tipo) : idCuenta(id), persona(persona), saldo(saldo), tipo(tipo) {}
+Cuenta::~Cuenta(){}
 
 TipoCuenta Cuenta::getTipo(void)
 {
    return tipo;
 }
-
-////////////////////////////////////////////////////////////////////////
-// Name:       Cuenta::setTipo(TipoCuenta newTipo)
-// Purpose:    Implementation of Cuenta::setTipo()
-// Parameters:
-// - newTipo
-// Return:     void
-////////////////////////////////////////////////////////////////////////
 
 void Cuenta::setTipo(TipoCuenta newTipo)
 {

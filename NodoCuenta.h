@@ -1,25 +1,21 @@
-/***********************************************************************
- * Module:  NodoCuenta.h
- * Author:  camev
- * Modified: sábado, 17 de mayo de 2025 21:05:35
- * Purpose: Declaration of the class NodoCuenta
- ***********************************************************************/
 
-#if !defined(__Proyecto1_NodoCuenta_h)
-#define __Proyecto1_NodoCuenta_h
+#ifndef __NODOCUENTA_H
+#define __NODOCUENTA_H
 
-#include <Cuenta.h>
-
+template <typename T>
 class NodoCuenta
 {
-public:
-protected:
 private:
-   Cuenta cuenta;
-   NodoCuenta* siguiente;
-   NodoCuenta* anterior;
-
-
+    T dato;
+    NodoCuenta<T>* siguiente;
+    NodoCuenta<T>* anterior;
+public:
+    NodoCuenta(const T& dato) : dato(dato), siguiente(nullptr), anterior(nullptr) {}
+    T& getDato() { return dato; }
+    NodoCuenta<T>* getSiguiente() const { return siguiente; }
+    NodoCuenta<T>* getAnterior() const { return anterior; }
+    void setSiguiente(NodoCuenta<T>* sig) { siguiente = sig; }
+    void setAnterior(NodoCuenta<T>* ant) { anterior = ant; }
 };
 
 #endif

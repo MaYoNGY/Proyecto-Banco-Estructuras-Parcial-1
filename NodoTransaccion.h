@@ -1,25 +1,20 @@
-/***********************************************************************
- * Module:  NodoTransaccion.h
- * Author:  camev
- * Modified: sábado, 17 de mayo de 2025 21:30:28
- * Purpose: Declaration of the class NodoTransaccion
- ***********************************************************************/
+#ifndef __NODOTRANSACCION_H
+#define __NODOTRANSACCION_H
 
-#if !defined(__Proyecto1_NodoTransaccion_h)
-#define __Proyecto1_NodoTransaccion_h
-
-#include <Transaccion.h>
-
+template<typename T>
 class NodoTransaccion
 {
-public:
-protected:
 private:
-   Transaccion transaccion;
-   NodoTransaccion* siguiente;
-   NodoTransaccion* anterior;
-
-
+   T dato;
+   NodoTransaccion<T>* siguiente;
+   NodoTransaccion<T>* anterior;
+public:
+   NodoTransaccion(const T& dato) : dato(dato), siguiente(nullptr), anterior(nullptr) {}
+   T& getDato() { return dato; }
+   NodoTransaccion<T>* getSiguiente() const { return siguiente; }
+   NodoTransaccion<T>* getAnterior() const { return anterior; }
+   void setSiguiente(NodoTransaccion<T>* sig) { siguiente = sig; }
+   void setAnterior(NodoTransaccion<T>* ant) { anterior = ant; }
 };
 
 #endif

@@ -1,101 +1,37 @@
-/***********************************************************************
- * Module:  Transaccion.cpp
- * Author:  camev
- * Modified: sábado, 17 de mayo de 2025 21:31:51
- * Purpose: Implementation of the class Transaccion
- ***********************************************************************/
-
 #include "Transaccion.h"
 
-////////////////////////////////////////////////////////////////////////
-// Name:       Transaccion::getTipoTransaccion()
-// Purpose:    Implementation of Transaccion::getTipoTransaccion()
-// Return:     std::string
-////////////////////////////////////////////////////////////////////////
-
-std::string Transaccion::getTipoTransaccion(void)
-{
-   return tipoTransaccion;
+Cuenta Transaccion::getCuenta() const { 
+   return cuenta; 
 }
 
-////////////////////////////////////////////////////////////////////////
-// Name:       Transaccion::setTipoTransaccion(std::string newTipoTransaccion)
-// Purpose:    Implementation of Transaccion::setTipoTransaccion()
-// Parameters:
-// - newTipoTransaccion
-// Return:     void
-////////////////////////////////////////////////////////////////////////
-
-void Transaccion::setTipoTransaccion(std::string newTipoTransaccion)
-{
-   tipoTransaccion = newTipoTransaccion;
+void Transaccion::setCuenta(const Cuenta& c) { 
+   cuenta = c; 
 }
 
-////////////////////////////////////////////////////////////////////////
-// Name:       Transaccion::getMonto()
-// Purpose:    Implementation of Transaccion::getMonto()
-// Return:     double
-////////////////////////////////////////////////////////////////////////
-
-double Transaccion::getMonto(void)
-{
-   return monto;
+TipoTransaccion Transaccion::getTipoTransaccion(void) { 
+   return tipoTransaccion; 
 }
 
-////////////////////////////////////////////////////////////////////////
-// Name:       Transaccion::setMonto(double newMonto)
-// Purpose:    Implementation of Transaccion::setMonto()
-// Parameters:
-// - newMonto
-// Return:     void
-////////////////////////////////////////////////////////////////////////
-
-void Transaccion::setMonto(double newMonto)
-{
-   monto = newMonto;
+void Transaccion::setTipoTransaccion(const TipoTransaccion& newTipoTransaccion) { 
+   tipoTransaccion = newTipoTransaccion; 
 }
 
-////////////////////////////////////////////////////////////////////////
-// Name:       Transaccion::getFecha()
-// Purpose:    Implementation of Transaccion::getFecha()
-// Return:     Fecha
-////////////////////////////////////////////////////////////////////////
-
-Fecha Transaccion::getFecha(void)
-{
-   return fecha;
+double Transaccion::getMonto(void) { 
+   return monto; 
 }
 
-////////////////////////////////////////////////////////////////////////
-// Name:       Transaccion::setFecha(Fecha newFecha)
-// Purpose:    Implementation of Transaccion::setFecha()
-// Parameters:
-// - newFecha
-// Return:     void
-////////////////////////////////////////////////////////////////////////
-
-void Transaccion::setFecha(Fecha newFecha)
-{
-   fecha = newFecha;
+void Transaccion::setMonto(double newMonto) { 
+   monto = newMonto; 
 }
 
-////////////////////////////////////////////////////////////////////////
-// Name:       Transaccion::Transaccion()
-// Purpose:    Implementation of Transaccion::Transaccion()
-// Return:     
-////////////////////////////////////////////////////////////////////////
-
-Transaccion::Transaccion()
-{
+Fecha Transaccion::getFecha(void) { 
+   return fecha; 
 }
 
-////////////////////////////////////////////////////////////////////////
-// Name:       Transaccion::~Transaccion()
-// Purpose:    Implementation of Transaccion::~Transaccion()
-// Return:     
-////////////////////////////////////////////////////////////////////////
-
-Transaccion::~Transaccion()
-{
-   // TODO : implement
+void Transaccion::setFecha(Fecha newFecha) { 
+   fecha = newFecha; 
 }
+
+Transaccion::Transaccion(const Cuenta& cuenta, const TipoTransaccion& tipo, double monto, const Fecha& fecha) : cuenta(cuenta), tipoTransaccion(tipo), monto(monto), fecha(fecha) {}
+
+Transaccion::~Transaccion() {}

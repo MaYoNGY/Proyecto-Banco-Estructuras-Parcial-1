@@ -1,15 +1,15 @@
-/***********************************************************************
- * Module:  Persona.h
- * Author:  camev
- * Modified: sábado, 17 de mayo de 2025 20:48:05
- * Purpose: Declaration of the class Persona
- ***********************************************************************/
-
-#if !defined(__Proyecto1_Persona_h)
-#define __Proyecto1_Persona_h
+#ifndef __PERSONA_H
+#define __PERSONA_H
+#include <string>
 
 class Persona
 {
+
+private:
+   std::string cedula;
+   std::string nombre;
+   std::string direccion;
+
 public:
    std::string getCedula(void);
    void setCedula(std::string newCedula);
@@ -19,13 +19,6 @@ public:
    void setDireccion(std::string newDireccion);
    Persona(std::string cedula, std::string nombre, std::string direccion);
    ~Persona();
-
-protected:
-private:
-   std::string cedula;
-   std::string nombre;
-   std::string direccion;
-
 
 };
 

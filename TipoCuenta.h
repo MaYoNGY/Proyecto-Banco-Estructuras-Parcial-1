@@ -1,24 +1,18 @@
-/***********************************************************************
- * Module:  TipoCuenta.h
- * Author:  camev
- * Modified: sábado, 17 de mayo de 2025 21:02:01
- * Purpose: Declaration of the class TipoCuenta
- ***********************************************************************/
-
-#if !defined(__Proyecto1_TipoCuenta_h)
-#define __Proyecto1_TipoCuenta_h
+#ifndef __TIPOCUENTA_H
+#define __TIPOCUENTA_H
+#include <string>
 
 class TipoCuenta
 {
-public:
-   TipoCuenta(std::string tipo);
-   ~TipoCuenta();
-
-protected:
 private:
-   std::string tipo;
+    std::string tipo; // Solo puede ser "ahorro" o "corriente"
 
-
+public:
+    TipoCuenta(const std::string& tipo); // Espera solo "ahorro" o "corriente"
+    ~TipoCuenta();
+    std::string getTipo() const;
+    bool esAhorro() const;
+    bool esCorriente() const;
 };
 
 #endif

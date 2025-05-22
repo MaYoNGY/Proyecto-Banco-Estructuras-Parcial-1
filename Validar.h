@@ -1,21 +1,16 @@
-/***********************************************************************
- * Module:  Validar.h
- * Author:  camev
- * Modified: sábado, 17 de mayo de 2025 21:36:55
- * Purpose: Declaration of the class Validar
- ***********************************************************************/
-
-#if !defined(__Proyecto1_Validar_h)
-#define __Proyecto1_Validar_h
+#ifndef __VALIDAR_H
+#define __VALIDAR_H
 
 class Validar
 {
 public:
-   int ingresoDatos(void);
+   int ingresoDatos(char mensaje[20]);
+   static bool validarCedulaEcuatoriana(const std::string& cedula);
 
-protected:
 private:
 
 };
 
 #endif
+
+

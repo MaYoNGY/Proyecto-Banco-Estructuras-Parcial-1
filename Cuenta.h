@@ -1,37 +1,35 @@
-/***********************************************************************
- * Module:  Cuenta.h
- * Author:  camev
- * Modified: sábado, 17 de mayo de 2025 21:02:01
- * Purpose: Declaration of the class Cuenta
- ***********************************************************************/
-
-#if !defined(__Proyecto1_Cuenta_h)
-#define __Proyecto1_Cuenta_h
+#ifndef __CUENTA_H
+#define __CUENTA_H
 
 #include <TipoCuenta.h>
+#include <string>
+#include <Persona.h>
 
 class Cuenta
 {
-public:
-   int getIdCuenta(void);
-   void setIdCuenta(int newIdCuenta);
-   std::string getNombre(void);
-   void setNombre(std::string newNombre);
-   double getSaldo(void);
-   void setSaldo(double newSaldo);
-   Cuenta();
-   ~Cuenta();
-   TipoCuenta getTipo(void);
-   void setTipo(TipoCuenta newTipo);
-
-protected:
 private:
    int idCuenta;
-   std::string nombre;
+   Persona persona;
    double saldo;
    TipoCuenta tipo;
 
+public:
+   int getIdCuenta(void);
+   void setIdCuenta(int newIdCuenta);
 
+   
+   std::string getNombre(void);     
+   void setNombre(std::string newNombre);
+   std::string getCedula(void);      
+   void setCedula(std::string newCedula); 
+
+   double getSaldo(void);
+   void setSaldo(double newSaldo);
+
+   Cuenta(int id, const Persona& persona, double saldo, TipoCuenta tipo);
+   ~Cuenta();
+   TipoCuenta getTipo(void);
+   void setTipo(TipoCuenta newTipo);
 };
 
 #endif
