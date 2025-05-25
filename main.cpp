@@ -14,6 +14,7 @@
 #include "TipoCuenta.cpp"
 #include "ListaCuenta.h"
 #include "ContrasenaUsuario.cpp"
+#include "Fecha.cpp"
 using namespace std;
 
 ListaCuenta<Cuenta> listaCuentas;
@@ -69,10 +70,17 @@ int submenuTipoCuenta() {
         int tecla = _getch();
         if (tecla == 224) { // Tecla especial
             tecla = _getch();
-            if (tecla == 72 && opcion > 0) // Flecha arriba
+        if (tecla == 72) { // Flecha arriba
+            if (opcion > 0)
                 opcion--;
-            else if (tecla == 80 && opcion < 2) // Flecha abajo
+            else
+                opcion = 2; // Si está en la primera opción, va a la última
+        } else if (tecla == 80) { // Flecha abajo
+            if (opcion < 2)
                 opcion++;
+            else
+            opcion = 0; // Si está en la última opción, va a la primera
+        }
         } else if (tecla == 13) { // Enter
             return opcion;
         }
@@ -94,19 +102,29 @@ void menuTransacciones(Cuenta* cuenta) {
         system("cls");
         cout << "===== Menu de Transacciones =====" << endl;
         cout << "Cuenta: " << cuenta->getTipo().getTipo() << " | ID: " << cuenta->getIdCuentaStr() << endl;
-        for (int i = 0; i < 5; i++) {
+        Fecha fechaCreacion = cuenta->getFechaCreacion();
+        cout << "Fecha de creacion: " << fechaCreacion.getDia() << "/" << fechaCreacion.getMes() << "/" << fechaCreacion.getAnio() << endl;
+        for (int i = 0; i <
+             5; i++) {
             if (i == opcion)
                 cout << ">> " << opciones[i] << endl;
             else
                 cout << "   " << opciones[i] << endl;
         }
         int tecla = _getch();
-        if (tecla == 224) {
+        if (tecla == 224) { // Tecla especial
             tecla = _getch();
-            if (tecla == 72 && opcion > 0)
-                opcion--;
-            else if (tecla == 80 && opcion < 4)
-                opcion++;
+            if (tecla == 72) { // Flecha arriba
+        if (opcion > 0)
+            opcion--;
+        else
+            opcion = 4; // Si está en la primera opción, va a la última
+        } else if (tecla == 80) { // Flecha abajo
+            if (opcion < 4)
+            opcion++;
+            else
+            opcion = 0; // Si está en la última opción, va a la primera
+        }
         } else if (tecla == 13) {
             switch (opcion) {
                 case 0:
@@ -167,17 +185,24 @@ Cuenta* submenuTipoCuentaUsuario(Cuenta* cuentasUsuario[2], int cuentaCount) {
             string tipo = cuentasUsuario[i]->getTipo().getTipo();
             string id = cuentasUsuario[i]->getIdCuentaStr();
             if (i == opcion)
-                cout << ">> " << tipo << " | ID: " << id << endl;
+                cout << ">> " << tipo << "    | ID: " << id << endl;
             else
-                cout << "   " << tipo << " | ID: " << id << endl;
+                cout << "   " << tipo << "  | ID: " << id << endl;
         }
         int tecla = _getch();
-        if (tecla == 224) {
+        if (tecla == 224) { // Tecla especial
             tecla = _getch();
-            if (tecla == 72 && opcion > 0) // Flecha arriba
+        if (tecla == 72) { // Flecha arriba
+            if (opcion > 0)
                 opcion--;
-            else if (tecla == 80 && opcion < cuentaCount - 1) // Flecha abajo
+            else
+                opcion = 1; // Si está en la primera opción, va a la última
+        } else if (tecla == 80) { // Flecha abajo
+            if (opcion < 1)
                 opcion++;
+            else
+            opcion = 0; // Si está en la última opción, va a la primera
+        }
         } else if (tecla == 13) { // Enter
             return cuentasUsuario[opcion];
         }
@@ -193,10 +218,17 @@ int main() {
         int tecla = _getch();
         if (tecla == 224) { // Tecla especial
             tecla = _getch();
-            if (tecla == 72 && opcion > 0) // Flecha arriba
+        if (tecla == 72) { // Flecha arriba
+            if (opcion > 0)
                 opcion--;
-            else if (tecla == 80 && opcion < 8) // Flecha abajo
+            else
+                opcion = 8; // Si está en la primera opción, va a la última
+        } else if (tecla == 80) { // Flecha abajo
+            if (opcion < 8)
                 opcion++;
+            else
+                opcion = 0; // Si está en la última opción, va a la primera
+        }
         } else if (tecla == 13) { // Enter
             switch (opcion) {
                 case 0: { // Crear nueva cuenta
@@ -204,39 +236,10 @@ int main() {
                     if (tipo == 2) // Regresar
                         break;
                     system("cls");
-                    string nombre, cedula, direccion;
+                    string nombre, apellido, cedula;
                 
-                    // Pedir cédula con validación
-                    while (true) {
-                        cout << "Ingrese su cedula: ";
-                        cedula = "";
-                        char c;
-                        while (true) {
-                            c = _getch();
-                            if (c == 13) { // Enter
-                                cout << endl;
-                                break;
-                            }
-                            if (c == 8) { // Backspace
-                                if (!cedula.empty()) {
-                                    cedula.pop_back();
-                                    cout << "\b \b";
-                                }
-                            } else if (c >= '0' && c <= '9' && cedula.length() < 10) {
-                                cedula += c;
-                                cout << c;
-                            }
-                        }
-                        if (cedula.length() == 10) {
-                            if (validarCedulaEcuatoriana(cedula)) {
-                                break;
-                            } else {
-                                cout << "Cedula invalida. Intente de nuevo." << endl;
-                            }
-                        } else {
-                            cout << "Cedula invalida. Intente de nuevo." << endl;
-                        }
-                    }
+                    // Pedir cédula con validación (ya valida dentro del método)
+                    cedula = Validar::pedirCedula();
                 
                     // Determinar tipo de cuenta
                     TipoCuenta tipoCuenta(tipo == 0 ? "ahorros" : "corriente");
@@ -255,34 +258,16 @@ int main() {
                     string contrasena;
                     if (cuentaExistente) {
                         nombre = cuentaExistente->getNombre();
+                        apellido = cuentaExistente->getApellido();
                         contrasena = cuentaExistente->getContrasena();
                         cout << "Usuario ya registrado. Se usaran los datos existentes." << endl;
                     } else {
-                        // Si no existe, pide nombre y dirección y genera contraseña
-                        cout << "Ingrese su nombre: ";
-                        nombre = "";
-                        char c;
-                        while (true) {
-                            c = _getch();
-                            if (c == 13) { // Enter
-                                cout << endl;
-                                if (!nombre.empty()) break;
-                            }
-                            else if (c == 8) { // Backspace
-                                if (!nombre.empty()) {
-                                    nombre.pop_back();
-                                    cout << "\b \b";
-                                }
-                            }
-                            else if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == ' ') {
-                                nombre += c;
-                                cout << c;
-                            }
-                        }
+                        nombre = Validar::pedirNombre();
+                        apellido = Validar::pedirApellido();
                         contrasena = ContrasenaUsuario::generarContrasenaBancaria();
                     }
                 
-                    Persona persona(cedula, nombre);
+                    Persona persona(cedula, nombre, apellido);
                     double saldoInicial = 0.0;
                     Cuenta cuenta(persona, saldoInicial, tipoCuenta);
                     cuenta.setContrasena(contrasena);
@@ -297,34 +282,10 @@ int main() {
                 case 1: { // Iniciar sesion para tramites
                     system("cls");
                     string cedula, contrasena;
-                    // Pedir cédula
-                    while (true) {
-                        cout << "Ingrese su cedula: ";
-                        cedula = "";
-                        char c;
-                        while (true) {
-                            c = _getch();
-                            if (c == 13) { cout << endl; break; }
-                            if (c == 8) {
-                                if (!cedula.empty()) { cedula.pop_back(); cout << "\b \b"; }
-                            } else if (c >= '0' && c <= '9' && cedula.length() < 10) {
-                                cedula += c; cout << c;
-                            }
-                        }
-                        break;
-                    }
+                    // Pedir cedula
+                    cedula = Validar::pedirCedula();
                     // Pedir contraseña
-                    cout << "Ingrese su contrasena: ";
-                    char ch;
-                    contrasena = "";
-                    while ((ch = _getch()) != 13) {
-                        if (ch == 8 && !contrasena.empty()) {
-                            contrasena.pop_back(); cout << "\b \b";
-                        } else if (ch != 8) {
-                            contrasena += ch; cout << '*';
-                        }
-                    }
-                    cout << endl;
+                    contrasena = Validar::pedirContrasena();
                 
                     Cuenta* cuentasUsuario[2] = {nullptr, nullptr};
                     int cuentaCount = listaCuentas.buscarCuentasPorCedulaYContrasena(cedula, contrasena, cuentasUsuario);

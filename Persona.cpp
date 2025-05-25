@@ -22,12 +22,22 @@ void Persona::setNombre(std::string newNombre)
    nombre = newNombre;
 }
 
+std::string Persona::getApellido(void)
+{
+   return apellido;
+}
 
-Persona::Persona(std::string cedula, std::string nombre)
+void Persona::setApellido(std::string newApellido)
+{
+   nombre = newApellido;
+}
+
+
+Persona::Persona(std::string cedula, std::string nombre, std::string apellido)
 {
    this->cedula = cedula;
    this->nombre = nombre;
-
+   this->apellido = apellido;
 }
 
 Persona::~Persona()

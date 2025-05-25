@@ -5,17 +5,17 @@
 #include <cctype>
 #include <string>
 
+
 // Variable estática para almacenar los IDs generados
 static std::set<std::string> idsGenerados;
 
 void Cuenta::generarIdCuenta() {
-    std::string nombreCompleto = persona.getNombre();
-    std::istringstream iss(nombreCompleto);
-    std::string nombre, apellido;
-    iss >> nombre >> apellido; // Se asume que siempre hay nombre y apellido
+    std::string nombre = persona.getNombre();
+    std::string apellido = persona.getApellido();
 
     std::string idBase = "";
-    idBase += toupper(nombre[0]);
+    if (!nombre.empty())
+        idBase += toupper(nombre[0]);
     idBase += apellido;
 
     std::string idGenerado = idBase;
@@ -28,7 +28,6 @@ void Cuenta::generarIdCuenta() {
 
     idsGenerados.insert(idGenerado);
     idCuenta = idGenerado;
-
 }
 
 std::string Cuenta::getIdCuentaStr(void) {
@@ -41,6 +40,14 @@ std::string Cuenta::getNombre(void) {
 
 void Cuenta::setNombre(std::string newNombre) { 
    persona.setNombre(newNombre); 
+}
+
+std::string Cuenta::getApellido(void) { 
+   return persona.getApellido(); 
+}
+
+void Cuenta::setApellido(std::string newApellido) { 
+   persona.setApellido(newApellido); 
 }
 
 std::string Cuenta::getCedula(void) { 
@@ -63,6 +70,7 @@ void Cuenta::setSaldo(double newSaldo) {
 Cuenta::Cuenta(const Persona& persona, double saldo, TipoCuenta tipo)
     : persona(persona), saldo(saldo), tipo(tipo) {
     generarIdCuenta();
+    fechaCreacion.inicializarConFechaActual();
 }
 
 Cuenta::~Cuenta() {}
@@ -81,4 +89,12 @@ void Cuenta::setContrasena(const std::string& contrasena) {
 
 std::string Cuenta::getContrasena() const {
     return contrasena;
+}
+
+void Cuenta::setFechaCreacion(const Fecha& fecha) { 
+   fechaCreacion = fecha; 
+}
+
+Fecha Cuenta::getFechaCreacion() const { 
+   return fechaCreacion; 
 }

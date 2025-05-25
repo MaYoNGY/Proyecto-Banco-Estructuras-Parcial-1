@@ -60,7 +60,9 @@ public:
       NodoCuenta<T>* actual = cabeza;
       do {
         std::cout << "ID: " << actual->getDato().getIdCuenta()
+                  << ", Cedula: " << actual->getDato().getCedula()
                   << ", Nombre: " << actual->getDato().getNombre()
+                  << ", Apellido: " << actual->getDato().getApellido()
                   << ", Saldo: " << actual->getDato().getSaldo()
                   << ", Tipo: " << actual->getDato().getTipo().getTipo()
                   << std::endl;

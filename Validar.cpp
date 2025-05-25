@@ -4,40 +4,130 @@
 #include <conio.h>
 #include <stdlib.h>
 #include <string>
+using namespace std;
 
-
-int ingresoDatos(char mensaje[20])
-{
-    char c;
-    int valor, i = 0;
-    char dato[10];
-    printf("\n%s", mensaje);
+std::string Validar::pedirCedula() {
+    std::string cedula;
     while (true) {
-        c = getch();
-
-        if (c == 13) {
+        cout << "Ingrese su cedula: ";
+        cedula = "";
+        char c;
+        while (true) {
+            c = _getch();
+            if (c == 13) { // Enter
+                cout << endl;
+                break;
+            }
+            if (c == 8) { // Backspace
+                if (!cedula.empty()) {
+                    cedula.pop_back();
+                    cout << "\b \b";
+                }
+            } else if (c >= '0' && c <= '9' && cedula.length() < 10) {
+                cedula += c;
+                cout << c;
+            }
+        }
+        if (cedula.length() == 10 && Validar::validarCedulaEcuatoriana(cedula)) {
             break;
-        }
-        else if (c == 8) {
-            if (i > 0) {
-                i--;
-                printf("\b \b");
-            }
-        }
-        else if (c >= '0' && c <= '9') {
-            if (i < 9) { //
-                dato[i++] = c;
-                printf("%c", c);
-            }
+        } else {
+            cout << "Cedula invalida. Intente de nuevo." << endl;
         }
     }
-
-    dato[i] = '\0';
-    valor = atoi(dato);
-    return valor;
+    return cedula;
 }
 
-bool validarCedulaEcuatoriana(const std::string& cedula) {
+std::string Validar::pedirNombre() {
+    std::string nombre;
+    do {
+        cout << "Ingrese su nombre: ";
+        nombre = "";
+        char c;
+        while (true) {
+            c = _getch();
+            if (c == 13) { // Enter
+                cout << endl;
+                break;
+            }
+            else if (c == 8) { // Backspace
+                if (!nombre.empty()) {
+                    nombre.pop_back();
+                    cout << "\b \b";
+                }
+            }
+            else if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == ' ') {
+                nombre += c;
+                cout << c;
+            }
+        }
+        if (nombre.empty()) {
+            cout << "El nombre no puede estar vacio. Intente de nuevo." << endl;
+        }
+    } while (nombre.empty());
+    return nombre;
+}
+
+std::string Validar::pedirApellido() {
+    std::string apellido;
+    do {
+        cout << "Ingrese su apellido: ";
+        apellido = "";
+        char c;
+        while (true) {
+            c = _getch();
+            if (c == 13) { // Enter
+                cout << endl;
+                break;
+            }
+            else if (c == 8) { // Backspace
+                if (!apellido.empty()) {
+                    apellido.pop_back();
+                    cout << "\b \b";
+                }
+            }
+            else if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == ' ') {
+                apellido += c;
+                cout << c;
+            }
+        }
+        if (apellido.empty()) {
+            cout << "El apellido no puede estar vacio. Intente de nuevo." << endl;
+        }
+    } while (apellido.empty());
+    return apellido;
+}
+
+std::string Validar::pedirContrasena() {
+    std::string contrasena;
+    do {
+    cout << "Ingrese su contrasena: ";
+    char c;
+        while (true) {
+        c = _getch();
+        if (c == 13) { // Enter
+            cout << endl;
+            break;
+        }
+        else if (c == 8) { // Backspace
+            if (!contrasena.empty()) {
+                contrasena.pop_back();
+                cout << "\b \b";
+            }
+        }
+        else {
+            contrasena += c;
+            cout << '*'; // Mostrar asterisco en lugar de caracter
+        }
+    
+        }
+        if (contrasena.empty()) {
+            cout << "La contraseña no puede estar vacia. Intente de nuevo." << endl;
+        }
+    }while(contrasena.empty());
+    return contrasena;
+}
+
+bool Validar::validarCedulaEcuatoriana(const std::string& cedula) {
     if (cedula.length() != 10) return false;
 
     for (char c : cedula) {
