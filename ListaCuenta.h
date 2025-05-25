@@ -40,7 +40,7 @@ public:
    NodoCuenta<T>* buscarCuenta(int idCuenta, const std::string& nombre) {
        if (!cabeza) {
          std::cout << "No hay cuentas en la lista." << std::endl;
-         return;
+            return nullptr;
       }
        NodoCuenta<T>* actual = cabeza;
        do {
@@ -57,7 +57,6 @@ public:
          std::cout << "No hay cuentas en la lista." << std::endl;
          return;
       }
-      NodoCuenta<T>* actual = cabeza;
       NodoCuenta<T>* actual = cabeza;
       do {
         std::cout << "ID: " << actual->getDato().getIdCuenta()

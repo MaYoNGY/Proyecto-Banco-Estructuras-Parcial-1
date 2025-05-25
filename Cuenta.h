@@ -1,22 +1,22 @@
 #ifndef __CUENTA_H
 #define __CUENTA_H
 
-#include <TipoCuenta.h>
+
 #include <string>
-#include <Persona.h>
+#include "TipoCuenta.h"
+#include "Persona.h"
 
 class Cuenta
 {
 private:
-   int idCuenta;
+   int idCuenta; 
    Persona persona;
    double saldo;
    TipoCuenta tipo;
 
 public:
-   int getIdCuenta(void);
+   int getIdCuenta(void) const;
    void setIdCuenta(int newIdCuenta);
-
    
    std::string getNombre(void);     
    void setNombre(std::string newNombre);
@@ -27,7 +27,11 @@ public:
    void setSaldo(double newSaldo);
 
    Cuenta(int id, const Persona& persona, double saldo, TipoCuenta tipo);
+      
+
+
    ~Cuenta();
+   
    TipoCuenta getTipo(void);
    void setTipo(TipoCuenta newTipo);
 };

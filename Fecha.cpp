@@ -1,4 +1,6 @@
 #include "Fecha.h"
+#include "Anio.h"
+#include "IngresoDatos.h"
 #include <iostream>
 #include <ctime>
 using namespace std;
@@ -24,8 +26,11 @@ void Fecha::setMes(int newMes)
 }
 
 int Fecha::getAnio(void)
-{
-   return anio;
+{    
+    Anio objAnio;              // Crea un objeto de la clase Anio
+    objAnio.setAnio(anio);     // Asigna el año actual de Fecha al objeto Anio
+    objAnio.iniciar// Aquí podrías llamar a métodos de validación de Anio si existen
+    return objAnio.getAnio();  // Retorna el año validado por la clase Anio
 }
 
 void Fecha::setAnio(int newAnio)
@@ -56,6 +61,19 @@ void Fecha::fecha(void)
             cout << "\nLa fecha ingresada no es valida para pago (dia inexistente, fin de semana o feriado)!!! Ingrese nuevamente:" << endl;
         }
    }
+}
+
+void Fecha::inicializarConFechaActual()
+{
+    // Obtiene la fecha y hora actual del sistema
+    time_t t = time(nullptr);
+    tm* now = localtime(&t);
+
+    dia = now->tm_mday;
+    mes = now->tm_mon + 1;      // tm_mon es 0-11, por eso se suma 1
+    anio = now->tm_year + 1900; // tm_year es años desde 1900
+
+    std::cout << "Fecha actual: " << dia << "/" << mes << "/" << anio << std::endl;
 }
 
 void Fecha::finalize(void){}

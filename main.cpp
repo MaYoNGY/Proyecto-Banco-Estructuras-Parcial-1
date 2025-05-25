@@ -8,7 +8,14 @@
 #include <conio.h> // Para _getch()
 #include <windows.h> // Para SetConsoleCursorPosition
 #include "VentanaAyuda.cpp"
+#include "Cuenta.cpp"
+#include "Persona.cpp"
+#include "TipoCuenta.cpp"
+#include "ListaCuenta.h"
+#include "ContrasenaUsuario.cpp"
 using namespace std;
+
+ListaCuenta<Cuenta> listaCuentas;
 
 // Función para mover el cursor a una posición específica
 void gotoxy(int x, int y) {
@@ -134,6 +141,7 @@ void menuTransacciones() {
     }
 }
 
+
 int main() {
     int opcion = 0;
     bool salir = false;
@@ -149,14 +157,41 @@ int main() {
         } else if (tecla == 13) { // Enter
             switch (opcion) {
                 case 0: { // Crear nueva cuenta
+                    
                     int tipo = submenuTipoCuenta();
                     if (tipo == 2) // Regresar
                         break;
                     system("cls");
+                    string nombre, cedula, direccion;
+                    cout << "Ingrese su cedula: ";
+                    cin >> cedula;
+                    cin.ignore();
+                    cout << "Ingrese su nombre: ";
+                    getline(cin, nombre);
+                    cout << "Ingrese su direccion: ";
+                    getline(cin, direccion);
+
+                    Persona persona(cedula, nombre, direccion);
+                    
+                    TipoCuenta tipoCuenta(tipo == 0 ? "ahorros" : "corriente");
+                    
                     if (tipo == 0)
-                        cout << "Seleccionaste cuenta de Ahorros." << endl;
-                    else if (tipo == 1)
+                        cout << "Seleccionaste cuenta Ahorros." << endl;
+                    else
                         cout << "Seleccionaste cuenta Corriente." << endl;
+                    
+                    static int idCuenta = 1000;
+                    idCuenta++;
+
+                    double saldoInicial = 0.0;
+                    Cuenta cuenta(idCuenta, persona, saldoInicial, tipoCuenta);
+                    listaCuentas.insertarCuenta(cuenta);
+
+                    cout << "Cuenta creada exitosamente con ID: " << idCuenta << endl;
+
+                    string contrasena = ContrasenaUsuario::generarContrasenaBancaria();
+                    cout << "Su contraseña bancaria es: " << contrasena << endl;
+
                     system("pause");
                     break;
                 }

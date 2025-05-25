@@ -14,6 +14,7 @@ public:
    int getAnio(void);
    void setAnio(int newAnio);
    void fecha(void);
+   void inicializarConFechaActual();
 
 protected:
    void finalize(void);

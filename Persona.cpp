@@ -4,7 +4,12 @@
 
 std::string Persona::getCedula(void)
 {
-   return cedula;
+    // Valida que la cédula tenga exactamente 10 dígitos
+    while (cedula.length() != 10) {
+        std::cout << "Error: La cédula debe tener exactamente 10 dígitos. Ingrese nuevamente: ";
+        std::cin >> cedula;
+    }
+    return cedula;
 }
 
 void Persona::setCedula(std::string newCedula)
@@ -34,7 +39,9 @@ void Persona::setDireccion(std::string newDireccion)
 
 Persona::Persona(std::string cedula, std::string nombre, std::string direccion)
 {
-   // TODO : implement
+   this->cedula = cedula;
+   this->nombre = nombre;
+   this->direccion = direccion;
 }
 
 Persona::~Persona()

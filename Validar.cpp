@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <conio.h>
 #include <stdlib.h>
-using namespace std;
+#include <string>
+
 
 int ingresoDatos(char mensaje[20])
 {

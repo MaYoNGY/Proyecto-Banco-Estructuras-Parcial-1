@@ -1,14 +1,7 @@
 #include "Anio.h"
+#include <iostream>
+#include <ctime> // Agrega esta línea
 
-bool Anio::getAnioBisiesto(void)
-{
-   return anioBisiesto;
-}
-
-void Anio::setAnioBisiesto(bool newAnioBisiesto)
-{
-   anioBisiesto = newAnioBisiesto;
-}
 
 int Anio::getAnio(void)
 {
@@ -22,10 +15,18 @@ void Anio::setAnio(int newAnio)
 
 void Anio::iniciar(void)
 {
-   // TODO : implement
+   // Inicializa el año actual
+   time_t t = time(nullptr);
+   tm* now = localtime(&t);
+   anio = now->tm_year + 1900; // Ajuste para obtener el año actual
+   std::cout << "Año inicializado: " << anio << std::endl;
 }
 
 void Anio::finalize(void)
 {
-   // TODO : implement
+    // Si necesitas liberar recursos antes de destruir el objeto
+    if (ptr != nullptr) {
+        delete ptr;
+        ptr = nullptr;
+    }
 }

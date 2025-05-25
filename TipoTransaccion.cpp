@@ -12,7 +12,7 @@ std::string TipoTransaccion::getTipo() const {
 }
 
 bool TipoTransaccion::esDeposito() const {
-    return tipo == "corriente";
+    return tipo == "deposito";
 }
 
 bool TipoTransaccion::esRetiro() const {
