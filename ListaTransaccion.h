@@ -1,6 +1,7 @@
 #ifndef __LISTATRANSACCION_H
 #define __LISTATRANSACCION_H
 #include "NodoTransaccion.h"
+#include <vector>
 
 template<typename T>
 class ListaTransaccion
@@ -72,6 +73,26 @@ public:
            actual = actual->getSiguiente();
        } while (actual != cabeza);
    }
+
+   // Buscar transacciones por id de cuenta y fecha
+   std::vector<T> buscarTransaccionesPorCuentaYFecha(int idCuenta, int dia, int mes, int anio) const {
+      std::vector<T> resultados;
+      if (!cabeza) return resultados;
+      NodoTransaccion<T>* actual = cabeza;
+      do {
+         const T& trans = actual->getDato();
+         if (trans.getCuenta().getIdCuenta() == idCuenta &&
+             trans.getFecha().getDia() == dia &&
+             trans.getFecha().getMes() == mes &&
+             trans.getFecha().getAnio() == anio) {
+            resultados.push_back(trans);
+         }
+         actual = actual->getSiguiente();
+      } while (actual != cabeza);
+      return resultados;
+   }
+
+   // Puedes agregar más funciones auxiliares para otros criterios si lo necesitas
 };
 
 #endif

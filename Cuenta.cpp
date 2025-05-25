@@ -53,6 +53,9 @@ void Cuenta::setApellido(std::string newApellido) {
 std::string Cuenta::getCedula(void) { 
    return persona.getCedula(); 
 }
+std::string Cuenta::getIdCuenta(void) { 
+   return idCuenta; 
+}
 
 void Cuenta::setCedula(std::string newCedula) { 
    persona.setCedula(newCedula); 

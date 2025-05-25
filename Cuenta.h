@@ -28,6 +28,8 @@ public:
    void setApellido(std::string newApellido);
    std::string getCedula(void);
    void setCedula(std::string newCedula);
+   std::string getIdCuenta(void);
+   void setIdCuenta(std::string newIdCuenta);
 
    double getSaldo(void);
    void setSaldo(double newSaldo);
@@ -43,6 +45,7 @@ public:
 
    void setFechaCreacion(const Fecha& fecha);
    Fecha getFechaCreacion() const;
+
 };
 
 #endif

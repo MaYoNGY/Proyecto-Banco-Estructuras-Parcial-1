@@ -99,8 +99,9 @@ int submenuTipoCuenta() {
 void menuTransacciones(Cuenta* cuenta) {
     int opcion = 0;
     bool esCorriente = cuenta->getTipo().esCorriente();
-    int numOpciones = esCorriente ? 8 : 5;
-    string opcionesCorriente[8] = {
+    // Añade una opción más para eliminar cuenta
+    int numOpciones = esCorriente ? 9 : 6;
+    string opcionesCorriente[9] = {
         "1. Consultar saldo",
         "2. Depositar dinero",
         "3. Retirar dinero",
@@ -108,24 +109,27 @@ void menuTransacciones(Cuenta* cuenta) {
         "5. Mostrar estado de sobregiro",
         "6. Calcular intereses de sobregiro",
         "7. Pagar sobregiro",
-        "8. Regresar"
+        "8. Regresar",
+        "9. Eliminar cuenta"
     };
-    string opcionesAhorro[5] = {
+    string opcionesAhorro[6] = {
         "1. Consultar saldo",
         "2. Depositar dinero",
         "3. Retirar dinero",
         "4. Mostrar historial",
-        "5. Regresar"
+        "5. Regresar",
+        "6. Eliminar cuenta"
     };
     bool regresar = false;
+    bool cuentaEliminada = false;
     OperacionCuenta operacion(*cuenta);
-    while (!regresar) {
+    while (!regresar && !cuentaEliminada) {
         system("cls");
         cout << "===== Menu de Transacciones =====" << endl;
         cout << "Cuenta: " << cuenta->getTipo().getTipo() << " | ID: " << cuenta->getIdCuentaStr() << endl;
         Fecha fechaCreacion = cuenta->getFechaCreacion();
         cout << "Fecha de creacion: " << fechaCreacion.getDia() << "/" << fechaCreacion.getMes() << "/" << fechaCreacion.getAnio() << endl;
-        for (int i = 0; i < (esCorriente ? 8 : 5); i++) {
+        for (int i = 0; i < (esCorriente ? 9 : 6); i++) {
             if ( (esCorriente && i == opcion) || (!esCorriente && i == opcion) )
                 cout << ">> " << (esCorriente ? opcionesCorriente[i] : opcionesAhorro[i]) << endl;
             else
@@ -138,9 +142,9 @@ void menuTransacciones(Cuenta* cuenta) {
                 if (opcion > 0)
                     opcion--;
                 else
-                    opcion = (esCorriente ? 7 : 4);
+                    opcion = (esCorriente ? 8 : 5);
             } else if (tecla == 80) { // Flecha abajo
-                if (opcion < (esCorriente ? 7 : 4))
+                if (opcion < (esCorriente ? 8 : 5))
                     opcion++;
                 else
                     opcion = 0;
@@ -176,6 +180,52 @@ void menuTransacciones(Cuenta* cuenta) {
                     case 4:
                         regresar = true;
                         break;
+                    case 5: { // Eliminar cuenta
+                        int confirmOpcion = 0;
+                        string opcionesConfirm[] = {"Confirmar eliminacion", "Regresar"};
+                        bool confirmar = false;
+                        while (!confirmar) {
+                            system("cls");
+                            cout << "¿Seguro que desea eliminar su cuenta? Esta accion no se puede deshacer." << endl;
+                            for (int i = 0; i < 2; i++) {
+                                if (i == confirmOpcion)
+                                    cout << ">> " << opcionesConfirm[i] << endl;
+                                else
+                                    cout << "   " << opcionesConfirm[i] << endl;
+                            }
+                            int teclaConf = _getch();
+                            if (teclaConf == 224) {
+                                teclaConf = _getch();
+                                if (teclaConf == 72) { // arriba
+                                    if (confirmOpcion > 0)
+                                        confirmOpcion--;
+                                    else
+                                        confirmOpcion = 1;
+                                } else if (teclaConf == 80) { // abajo
+                                    if (confirmOpcion < 1)
+                                        confirmOpcion++;
+                                    else
+                                        confirmOpcion = 0;
+                                }
+                            } else if (teclaConf == 13) {
+                                if (confirmOpcion == 0) {
+                                    bool eliminada = listaCuentas.eliminarCuentaPorCedulaYTipo(
+                                        cuenta->getCedula(),
+                                        cuenta->getTipo().getTipo()
+                                    );
+                                    if (eliminada) {
+                                        cout << "Cuenta eliminada exitosamente." << endl;
+                                        cuentaEliminada = true;
+                                    } else {
+                                        cout << "No se pudo eliminar la cuenta." << endl;
+                                    }
+                                    system("pause");
+                                }
+                                confirmar = true;
+                            }
+                        }
+                        break;
+                    }
                 }
             } else {
                 switch (opcion) {
@@ -235,6 +285,55 @@ void menuTransacciones(Cuenta* cuenta) {
                         break;
                     }
                     case 7:
+                        regresar = true;
+                        break;
+                    case 8: { // Eliminar cuenta
+                        int confirmOpcion = 0;
+                        string opcionesConfirm[] = {"Confirmar eliminacion", "Regresar"};
+                        bool confirmar = false;
+                        while (!confirmar) {
+                            system("cls");
+                            cout << "¿Seguro que desea eliminar su cuenta? Esta accion no se puede deshacer." << endl;
+                            for (int i = 0; i < 2; i++) {
+                                if (i == confirmOpcion)
+                                    cout << ">> " << opcionesConfirm[i] << endl;
+                                else
+                                    cout << "   " << opcionesConfirm[i] << endl;
+                            }
+                            int teclaConf = _getch();
+                            if (teclaConf == 224) {
+                                teclaConf = _getch();
+                                if (teclaConf == 72) { // arriba
+                                    if (confirmOpcion > 0)
+                                        confirmOpcion--;
+                                    else
+                                        confirmOpcion = 1;
+                                } else if (teclaConf == 80) { // abajo
+                                    if (confirmOpcion < 1)
+                                        confirmOpcion++;
+                                    else
+                                        confirmOpcion = 0;
+                                }
+                            } else if (teclaConf == 13) {
+                                if (confirmOpcion == 0) {
+                                    bool eliminada = listaCuentas.eliminarCuentaPorCedulaYTipo(
+                                        cuenta->getCedula(),
+                                        cuenta->getTipo().getTipo()
+                                    );
+                                    if (eliminada) {
+                                        cout << "Cuenta eliminada exitosamente." << endl;
+                                        cuentaEliminada = true;
+                                    } else {
+                                        cout << "No se pudo eliminar la cuenta." << endl;
+                                    }
+                                    system("pause");
+                                }
+                                confirmar = true;
+                            }
+                        }
+                        break;
+                    }
+                    case 9:
                         regresar = true;
                         break;
                 }
@@ -381,6 +480,7 @@ int main() {
                 case 2:
                     system("cls");
                     cout << "Consultas avanzadas (no implementado)." << endl;
+                    
                     system("pause");
                     break;
                 case 3:

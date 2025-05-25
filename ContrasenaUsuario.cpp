@@ -6,9 +6,9 @@
 
 std::string ContrasenaUsuario::generarContrasenaBancaria() {
     const std::string numeros = "0123456789";
-    const std::string letrasMayus = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const std::string letrasMinus = "abcdefghijklmnopqrstuvwxyz";
-    const std::string simbolos = "!@#$%^&*()-_=+[]{}|;:,.<>?";
+    const std::string letrasMayus = "ABCDEFGHIJLMNOPQRSTUVWXYZ";
+    const std::string letrasMinus = "abcdefghijmnopqrstuvwxyz";
+    const std::string simbolos = "!@#*-_=+.?";
 
     // Mejor entropía: mezcla tiempo y dirección de variable local
     auto now = std::chrono::high_resolution_clock::now().time_since_epoch().count();

@@ -70,15 +70,15 @@ public:
     } while (actual != cabeza);
    }
 
-   void eliminarCuenta(int idCuenta) {
+   /*void eliminarCuenta(int idCuenta) {
        if (!cabeza) {
-         std::cout << "No hay cuentas en la lista." << std::endl;
-         return;
-      }
-   
+           std::cout << "No hay cuentas en la lista." << std::endl;
+           return;
+       }
+
        NodoCuenta<T>* actual = cabeza;
        do {
-           if (actual->getDato().getIdCuenta() == idCuenta) {
+           if (std::stoi(actual->getDato().getIdCuenta()) == idCuenta) {
                if (actual == cabeza && actual == cola) {
                    // Solo hay un nodo
                    delete actual;
@@ -87,18 +87,22 @@ public:
                }
                if (actual == cabeza) {
                    cabeza = cabeza->getSiguiente();
-               }
-               if (actual == cola) {
+                   cola->setSiguiente(cabeza);
+                   cabeza->setAnterior(cola);
+               } else if (actual == cola) {
                    cola = cola->getAnterior();
+                   cola->setSiguiente(cabeza);
+                   cabeza->setAnterior(cola);
+               } else {
+                   actual->getAnterior()->setSiguiente(actual->getSiguiente());
+                   actual->getSiguiente()->setAnterior(actual->getAnterior());
                }
-               actual->getAnterior()->setSiguiente(actual->getSiguiente());
-               actual->getSiguiente()->setAnterior(actual->getAnterior());
                delete actual;
                return;
            }
            actual = actual->getSiguiente();
        } while (actual != cabeza);
-   }
+   }*/
 
     T* buscarCuentaPorCedula(const std::string& cedula) {
         if (!cabeza) return nullptr;
@@ -141,6 +145,40 @@ public:
         }
         return cuentaCount;
     }
+
+   // Elimina la cuenta por cédula y tipo (totalmente independiente)
+   bool eliminarCuentaPorCedulaYTipo(const std::string& cedula, const std::string& tipo) {
+       if (!cabeza) return false;
+       NodoCuenta<T>* actual = cabeza;
+       
+       do {
+           if (actual->getDato().getCedula() == cedula &&
+               actual->getDato().getTipo().getTipo() == tipo) {
+               // Eliminar el nodo actual de la lista circular
+               if (actual == cabeza && actual == cola) {
+                   delete actual;
+                   cabeza = cola = nullptr;
+                   return true;
+               }
+               if (actual == cabeza) {
+                   cabeza = cabeza->getSiguiente();
+                   cola->setSiguiente(cabeza);
+                   cabeza->setAnterior(cola);
+               } else if (actual == cola) {
+                   cola = cola->getAnterior();
+                   cola->setSiguiente(cabeza);
+                   cabeza->setAnterior(cola);
+               } else {
+                   actual->getAnterior()->setSiguiente(actual->getSiguiente());
+                   actual->getSiguiente()->setAnterior(actual->getAnterior());
+               }
+               delete actual;
+               return true;
+           }
+           actual = actual->getSiguiente();
+       } while (actual != cabeza);
+       return false;
+   }
 };
 
 #endif
