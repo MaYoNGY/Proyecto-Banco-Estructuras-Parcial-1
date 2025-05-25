@@ -100,6 +100,27 @@ bool OperacionCuenta::retirar(double monto) {
     return false;
 }
 
+// Nueva función para retiro simple en cuenta de ahorro
+bool OperacionCuenta::retirarAhorroSimple(double monto) {
+    double tolerancia = 0.01;
+    if (monto <= 0) {
+        std::cout << "Monto a retirar debe ser mayor que 0.\n";
+        return false;
+    }
+    if (monto > 1000) {
+        std::cout << "No puede retirar mas de $1000 en un solo retiro.\n";
+        return false;
+    }
+    if (cuenta.getSaldo() + tolerancia >= monto) {
+        cuenta.setSaldo(cuenta.getSaldo() - monto);
+        std::cout << "Retiro exitoso. Nuevo saldo: $" << cuenta.getSaldo() << "\n";
+        return true;
+    } else {
+        std::cout << "Saldo insuficiente en cuenta de ahorros. No puede retirar esa cantidad.\n";
+        return false;
+    }
+}
+
 void OperacionCuenta::iniciarSobregiro(double monto) {
     // Control de límite mensual
     std::time_t ahora = std::time(nullptr);

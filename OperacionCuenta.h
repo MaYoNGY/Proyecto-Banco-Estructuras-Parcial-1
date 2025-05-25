@@ -42,6 +42,8 @@ public:
     // Otros métodos
     void calcularInteresSobregiro();
     void aplicarInteresAhorros();
+    // En OperacionCuenta.h
+    bool retirarAhorroSimple(double monto);
 
     void mostrarEstadoSobregiro() const;
     void pagarSobregiro(double monto);

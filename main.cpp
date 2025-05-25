@@ -167,7 +167,8 @@ void menuTransacciones(Cuenta* cuenta) {
                     case 2: {
                         system("cls");
                         double monto = pedirMontoSeguro("Ingrese monto a retirar: $");
-                        operacion -= monto;
+                        // Llama a la nueva función para retiro en cuenta de ahorro
+                        operacion.retirarAhorroSimple(monto);
                         cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
                         system("pause");
                         break;

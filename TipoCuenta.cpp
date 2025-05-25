@@ -12,7 +12,7 @@ std::string TipoCuenta::getTipo() const {
 }
 
 bool TipoCuenta::esAhorro() const {
-    return tipo == "ahorro";
+    return tipo == "Ahorro";
 }
 
 bool TipoCuenta::esCorriente() const {

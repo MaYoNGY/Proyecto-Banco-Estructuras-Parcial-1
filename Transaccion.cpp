@@ -24,9 +24,9 @@ void Transaccion::setMonto(double newMonto) {
    monto = newMonto; 
 }
 
-Fecha Transaccion::inicializarConFechaActual() const { 
+/*Fecha Transaccion::inicializarConFechaActual() const { 
    return fecha; 
-}
+}*/
 
 void Transaccion::setFecha(Fecha newFecha) { 
    fecha = newFecha; 
