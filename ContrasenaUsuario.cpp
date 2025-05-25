@@ -2,15 +2,20 @@
 #include <random>
 #include <string>
 #include <iostream>
+#include <chrono>
 
 std::string ContrasenaUsuario::generarContrasenaBancaria() {
-   const std::string numeros = "0123456789";
+    const std::string numeros = "0123456789";
     const std::string letrasMayus = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     const std::string letrasMinus = "abcdefghijklmnopqrstuvwxyz";
     const std::string simbolos = "!@#$%^&*()-_=+[]{}|;:,.<>?";
 
-    std::random_device rd;
-    std::mt19937 generador(rd());
+    // Mejor entropía: mezcla tiempo y dirección de variable local
+    auto now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    int stack_var = 0;
+    std::seed_seq seed{static_cast<unsigned int>(now), static_cast<unsigned int>(reinterpret_cast<uintptr_t>(&stack_var))};
+    std::mt19937 generador(seed);
+
     std::uniform_int_distribution<> distNum(0, numeros.size() - 1);
     std::uniform_int_distribution<> distMayus(0, letrasMayus.size() - 1);
     std::uniform_int_distribution<> distMinus(0, letrasMinus.size() - 1);

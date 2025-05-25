@@ -12,6 +12,11 @@ private:
     double montoSobregiro;
     std::time_t fechaInicioSobregiro;
 
+    // Para control de sobregiros mensuales
+    int sobregirosEsteMes;
+    int mesUltimoSobregiro;
+    int anioUltimoSobregiro;
+
 public:
     OperacionCuenta(Cuenta& c);
 

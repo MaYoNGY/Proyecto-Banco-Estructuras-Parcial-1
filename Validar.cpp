@@ -127,6 +127,65 @@ std::string Validar::pedirContrasena() {
     return contrasena;
 }
 
+std::string Validar::pedirMonto() {
+    std::string monto;
+    char c;
+    cout << "(Solo numeros y punto decimal, maximo 2 decimales, Enter para finalizar)\n";
+    while (true) {
+        monto = "";
+        bool tienePunto = false;
+        int decimales = 0;
+        while (true) {
+            c = _getch();
+            if (c == 13) { // Enter
+                cout << endl;
+                break;
+            }
+            if (c == 8) { // Backspace
+                if (!monto.empty()) {
+                    if (monto.back() == '.') {
+                        tienePunto = false;
+                        decimales = 0;
+                    } else if (tienePunto) {
+                        decimales--;
+                    }
+                    monto.pop_back();
+                    cout << "\b \b";
+                }
+            } else if ((c >= '0' && c <= '9')) {
+                if (tienePunto) {
+                    if (decimales < 2) {
+                        monto += c;
+                        decimales++;
+                        cout << c;
+                    }
+                } else {
+                    monto += c;
+                    cout << c;
+                }
+            } else if (c == '.' && !tienePunto && !monto.empty()) {
+                monto += c;
+                tienePunto = true;
+                decimales = 0;
+                cout << c;
+            }
+        }
+        // Validar formato y que sea mayor a 0
+        try {
+            double val = std::stod(monto);
+            // Validar máximo 2 decimales
+            size_t punto = monto.find('.');
+            if (val > 0 && (punto == std::string::npos || monto.size() - punto - 1 <= 2)) {
+                return monto;
+            } else {
+                cout << "El monto debe ser mayor que 0 y tener maximo 2 decimales. Intente de nuevo: ";
+            }
+        } catch (...) {
+            cout << "Monto invalido. Intente de nuevo: ";
+        }
+    }
+}
+
 bool Validar::validarCedulaEcuatoriana(const std::string& cedula) {
     if (cedula.length() != 10) return false;
 

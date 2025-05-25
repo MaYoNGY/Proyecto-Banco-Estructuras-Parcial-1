@@ -7,6 +7,7 @@
 #include <iostream>
 #include <conio.h> // Para _getch()
 #include <windows.h> // Para SetConsoleCursorPosition
+#include <string>
 #include "Validar.cpp"
 #include "VentanaAyuda.cpp"
 #include "Cuenta.cpp"
@@ -15,6 +16,7 @@
 #include "ListaCuenta.h"
 #include "ContrasenaUsuario.cpp"
 #include "Fecha.cpp"
+#include "OperacionCuenta.cpp"
 using namespace std;
 
 ListaCuenta<Cuenta> listaCuentas;
@@ -25,6 +27,12 @@ void gotoxy(int x, int y) {
     coord.X = x;
     coord.Y = y;
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+
+double pedirMontoSeguro(const std::string& mensaje) {
+    std::cout << mensaje;
+    std::string montoStr = Validar::pedirMonto();
+    return std::stod(montoStr);
 }
 
 // Imprime el menú y resalta la opción seleccionada
@@ -90,84 +98,146 @@ int submenuTipoCuenta() {
 // Menú de transacciones tras login exitoso
 void menuTransacciones(Cuenta* cuenta) {
     int opcion = 0;
-    string opciones[] = {
+    bool esCorriente = cuenta->getTipo().esCorriente();
+    int numOpciones = esCorriente ? 8 : 5;
+    string opcionesCorriente[8] = {
         "1. Consultar saldo",
         "2. Depositar dinero",
         "3. Retirar dinero",
         "4. Mostrar historial",
-        "5. Salir"
+        "5. Mostrar estado de sobregiro",
+        "6. Calcular intereses de sobregiro",
+        "7. Pagar sobregiro",
+        "8. Regresar"
     };
-    bool salir = false;
-    while (!salir) {
+    string opcionesAhorro[5] = {
+        "1. Consultar saldo",
+        "2. Depositar dinero",
+        "3. Retirar dinero",
+        "4. Mostrar historial",
+        "5. Regresar"
+    };
+    bool regresar = false;
+    OperacionCuenta operacion(*cuenta);
+    while (!regresar) {
         system("cls");
         cout << "===== Menu de Transacciones =====" << endl;
         cout << "Cuenta: " << cuenta->getTipo().getTipo() << " | ID: " << cuenta->getIdCuentaStr() << endl;
         Fecha fechaCreacion = cuenta->getFechaCreacion();
         cout << "Fecha de creacion: " << fechaCreacion.getDia() << "/" << fechaCreacion.getMes() << "/" << fechaCreacion.getAnio() << endl;
-        for (int i = 0; i <
-             5; i++) {
-            if (i == opcion)
-                cout << ">> " << opciones[i] << endl;
+        for (int i = 0; i < (esCorriente ? 8 : 5); i++) {
+            if ( (esCorriente && i == opcion) || (!esCorriente && i == opcion) )
+                cout << ">> " << (esCorriente ? opcionesCorriente[i] : opcionesAhorro[i]) << endl;
             else
-                cout << "   " << opciones[i] << endl;
+                cout << "   " << (esCorriente ? opcionesCorriente[i] : opcionesAhorro[i]) << endl;
         }
         int tecla = _getch();
-        if (tecla == 224) { // Tecla especial
+        if (tecla == 224) {
             tecla = _getch();
             if (tecla == 72) { // Flecha arriba
-        if (opcion > 0)
-            opcion--;
-        else
-            opcion = 4; // Si está en la primera opción, va a la última
-        } else if (tecla == 80) { // Flecha abajo
-            if (opcion < 4)
-            opcion++;
-            else
-            opcion = 0; // Si está en la última opción, va a la primera
-        }
+                if (opcion > 0)
+                    opcion--;
+                else
+                    opcion = (esCorriente ? 7 : 4);
+            } else if (tecla == 80) { // Flecha abajo
+                if (opcion < (esCorriente ? 7 : 4))
+                    opcion++;
+                else
+                    opcion = 0;
+            }
         } else if (tecla == 13) {
-            switch (opcion) {
-                case 0:
-                    system("cls");
-                    cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
-                    system("pause");
-                    break;
-                case 1: {
-                    system("cls");
-                    double monto;
-                    cout << "Ingrese monto a depositar: $";
-                    cin >> monto;
-                    if (monto > 0) {
-                        cuenta->setSaldo(cuenta->getSaldo() + monto);
-                        cout << "Deposito realizado. Nuevo saldo: $" << cuenta->getSaldo() << endl;
-                    } else {
-                        cout << "Monto invalido." << endl;
+            if (!esCorriente) {
+                switch (opcion) {
+                    case 0:
+                        system("cls");
+                        cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
+                        system("pause");
+                        break;
+                    case 1: {
+                        system("cls");
+                        double monto = pedirMontoSeguro("Ingrese monto a depositar: $");
+                        operacion += monto;
+                        system("pause");
+                        break;
                     }
-                    system("pause");
-                    break;
-                }
-                case 2: {
-                    system("cls");
-                    double monto;
-                    cout << "Ingrese monto a retirar: $";
-                    cin >> monto;
-                    if (monto > 0 && monto <= cuenta->getSaldo()) {
-                        cuenta->setSaldo(cuenta->getSaldo() - monto);
-                        cout << "Retiro realizado. Nuevo saldo: $" << cuenta->getSaldo() << endl;
-                    } else {
-                        cout << "Monto invalido o saldo insuficiente." << endl;
+                    case 2: {
+                        system("cls");
+                        double monto = pedirMontoSeguro("Ingrese monto a retirar: $");
+                        operacion -= monto;
+                        cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
+                        system("pause");
+                        break;
                     }
-                    system("pause");
-                    break;
+                    case 3:
+                        system("cls");
+                        cout << "Historial de transacciones (simulado)" << endl;
+                        system("pause");
+                        break;
+                    case 4:
+                        regresar = true;
+                        break;
                 }
-                case 3:
-                    system("cls");
-                    cout << "Historial de transacciones (simulado)" << endl;
-                    system("pause");
-                    break;
-                case 4:
-                    salir = true;
-                    break;
+            } else {
+                switch (opcion) {
+                    case 0:
+                        system("cls");
+                        cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
+                        system("pause");
+                        break;
+                    case 1: {
+                        system("cls");
+                        double monto = pedirMontoSeguro("Ingrese monto a depositar: $");
+                        operacion += monto;
+                        system("pause");
+                        break;
+                    }
+                    case 2: {
+                        system("cls");
+                        double monto = pedirMontoSeguro("Ingrese monto a retirar: $");
+                        operacion -= monto;
+                        cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
+                        system("pause");
+                        break;
+                    }
+                    case 3:
+                        system("cls");
+                        cout << "Historial de transacciones (simulado)" << endl;
+                        system("pause");
+                        break;
+                    case 4:
+                        system("cls");
+                        operacion.mostrarEstadoSobregiro();
+                        system("pause");
+                        break;
+                    case 5:
+                        system("cls");
+                        operacion.calcularInteresSobregiro();
+                        system("pause");
+                        break;
+                    case 6: {
+                        system("cls");
+                        // Solo permite pagar hasta el monto pendiente de sobregiro
+                        double montoMax = operacion.operator-(0); // saldo - 0 = saldo actual
+                        double montoPagar;
+                        cout << "Ingrese monto a pagar de sobregiro: $";
+                        while (true) {
+                            montoPagar = pedirMontoSeguro("");
+                            // Para obtener el monto pendiente de sobregiro:
+                            // Usamos un cast a double para acceder al atributo privado (no hay getter, así que mejor pedirlo al usuario y validar en pagarSobregiro)
+                            if (montoPagar > 0 && montoPagar <= 5000) { // 5000 es arbitrario, el método ya valida el monto real
+                                operacion.pagarSobregiro(montoPagar);
+                                break;
+                            } else {
+                                cout << "Monto invalido. Intente de nuevo: $";
+                            }
+                        }
+                        system("pause");
+                        break;
+                    }
+                    case 7:
+                        regresar = true;
+                        break;
+                }
             }
         }
     }
@@ -210,6 +280,8 @@ Cuenta* submenuTipoCuentaUsuario(Cuenta* cuentasUsuario[2], int cuentaCount) {
 }
 
 
+
+
 int main() {
     int opcion = 0;
     bool salir = false;
@@ -244,7 +316,7 @@ int main() {
                     // Determinar tipo de cuenta
                     TipoCuenta tipoCuenta(tipo == 0 ? "ahorros" : "corriente");
                 
-                    // Verificar si ya existe una cuenta de ese tipo para esa cédula
+                    // Verificar si ya existe una cuenta de ese tipo para esa cedula
                     Cuenta* cuentaMismaTipo = listaCuentas.buscarCuentaPorCedulaYTipo(cedula, tipoCuenta.getTipo());
                     if (cuentaMismaTipo) {
                         cout << "Ya existe una cuenta de tipo " << tipoCuenta.getTipo() << " para esta cedula." << endl;

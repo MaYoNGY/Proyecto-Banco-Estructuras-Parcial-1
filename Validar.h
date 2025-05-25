@@ -10,6 +10,7 @@ public:
    static std::string pedirNombre();
    static std::string pedirApellido();
    static std::string pedirContrasena();
+   static std::string pedirMonto();
    static bool validarCedulaEcuatoriana(const std::string& cedula);
 
 
