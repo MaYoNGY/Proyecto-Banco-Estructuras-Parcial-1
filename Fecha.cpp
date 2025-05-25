@@ -1,6 +1,6 @@
 #include "Fecha.h"
+#include "Validar.h"
 #include "Anio.h"
-#include "IngresoDatos.h"
 #include <iostream>
 #include <ctime>
 using namespace std;
@@ -27,10 +27,7 @@ void Fecha::setMes(int newMes)
 
 int Fecha::getAnio(void)
 {    
-    Anio objAnio;              // Crea un objeto de la clase Anio
-    objAnio.setAnio(anio);     // Asigna el año actual de Fecha al objeto Anio
-    objAnio.iniciar// Aquí podrías llamar a métodos de validación de Anio si existen
-    return objAnio.getAnio();  // Retorna el año validado por la clase Anio
+   return anio;
 }
 
 void Fecha::setAnio(int newAnio)

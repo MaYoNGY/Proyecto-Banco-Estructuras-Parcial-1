@@ -1,5 +1,6 @@
 #ifndef __VALIDAR_H
 #define __VALIDAR_H
+#include <string>
 
 class Validar
 {

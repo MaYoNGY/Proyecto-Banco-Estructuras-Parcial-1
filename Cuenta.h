@@ -9,29 +9,31 @@
 class Cuenta
 {
 private:
-   int idCuenta; 
+   std::string idCuenta; 
    Persona persona;
    double saldo;
    TipoCuenta tipo;
+   std::string contrasena;
 
+// ...existing code...
 public:
-   int getIdCuenta(void) const;
-   void setIdCuenta(int newIdCuenta);
-   
-   std::string getNombre(void);     
+   std::string getIdCuentaStr(void);
+   void generarIdCuenta();
+
+   std::string getNombre(void);
    void setNombre(std::string newNombre);
-   std::string getCedula(void);      
-   void setCedula(std::string newCedula); 
+   std::string getCedula(void);
+   void setCedula(std::string newCedula);
 
    double getSaldo(void);
    void setSaldo(double newSaldo);
 
-   Cuenta(int id, const Persona& persona, double saldo, TipoCuenta tipo);
-      
+   void setContrasena(const std::string& contrasena);
+    std::string getContrasena() const;
 
-
+   Cuenta(const Persona& persona, double saldo, TipoCuenta tipo); // <--- CORREGIDO
    ~Cuenta();
-   
+
    TipoCuenta getTipo(void);
    void setTipo(TipoCuenta newTipo);
 };

@@ -37,7 +37,7 @@ public:
       }
    }
 
-   NodoCuenta<T>* buscarCuenta(int idCuenta, const std::string& nombre) {
+   NodoCuenta<T>* buscarCuenta(int idCuenta, const std::string& nombre) { /// modificar para que busque el id 
        if (!cabeza) {
          std::cout << "No hay cuentas en la lista." << std::endl;
             return nullptr;
@@ -97,6 +97,48 @@ public:
            actual = actual->getSiguiente();
        } while (actual != cabeza);
    }
+
+    T* buscarCuentaPorCedula(const std::string& cedula) {
+        if (!cabeza) return nullptr;
+        NodoCuenta<T>* actual = cabeza;
+        do {
+            if (actual->getDato().getCedula() == cedula) {
+                return &(actual->getDato());
+            }
+            actual = actual->getSiguiente();
+        } while (actual != cabeza);
+        return nullptr;
+    }
+
+    T* buscarCuentaPorCedulaYTipo(const std::string& cedula, const std::string& tipo) {
+    if (!cabeza) return nullptr;
+    NodoCuenta<T>* actual = cabeza;
+    do {
+        if (actual->getDato().getCedula() == cedula &&
+            actual->getDato().getTipo().getTipo() == tipo) {
+            return &(actual->getDato());
+        }
+        actual = actual->getSiguiente();
+    } while (actual != cabeza);
+    return nullptr;
+    }
+
+    int buscarCuentasPorCedulaYContrasena(const std::string& cedula, const std::string& contrasena, Cuenta* cuentasUsuario[2]) {
+        int cuentaCount = 0;
+        NodoCuenta<Cuenta>* actual = cabeza;
+        if (actual) {
+            do {
+                Cuenta& cuenta = actual->getDato();
+                if (cuenta.getCedula() == cedula && cuenta.getContrasena() == contrasena) {
+                    if (cuentaCount < 2) {
+                        cuentasUsuario[cuentaCount++] = &cuenta;
+                    }
+                }
+                actual = actual->getSiguiente();
+            } while (actual != cabeza);
+        }
+        return cuentaCount;
+    }
 };
 
 #endif

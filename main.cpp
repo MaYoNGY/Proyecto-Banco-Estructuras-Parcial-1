@@ -7,6 +7,7 @@
 #include <iostream>
 #include <conio.h> // Para _getch()
 #include <windows.h> // Para SetConsoleCursorPosition
+#include "Validar.cpp"
 #include "VentanaAyuda.cpp"
 #include "Cuenta.cpp"
 #include "Persona.cpp"
@@ -78,14 +79,8 @@ int submenuTipoCuenta() {
     }
 }
 
-// Simulación de validación de usuario (puedes reemplazar por tu lógica real)
-bool validarUsuario(const std::string& cedula, const std::string& clave) {
-    // Usuario y clave fijos para demo
-    return (cedula == "12345678" && clave == "1234");
-}
-
 // Menú de transacciones tras login exitoso
-void menuTransacciones() {
+void menuTransacciones(Cuenta* cuenta) {
     int opcion = 0;
     string opciones[] = {
         "1. Consultar saldo",
@@ -98,6 +93,7 @@ void menuTransacciones() {
     while (!salir) {
         system("cls");
         cout << "===== Menu de Transacciones =====" << endl;
+        cout << "Cuenta: " << cuenta->getTipo().getTipo() << " | ID: " << cuenta->getIdCuentaStr() << endl;
         for (int i = 0; i < 5; i++) {
             if (i == opcion)
                 cout << ">> " << opciones[i] << endl;
@@ -115,19 +111,37 @@ void menuTransacciones() {
             switch (opcion) {
                 case 0:
                     system("cls");
-                    cout << "Saldo actual: $1000 (simulado)" << endl;
+                    cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
                     system("pause");
                     break;
-                case 1:
+                case 1: {
                     system("cls");
-                    cout << "Depositar dinero (simulado)" << endl;
+                    double monto;
+                    cout << "Ingrese monto a depositar: $";
+                    cin >> monto;
+                    if (monto > 0) {
+                        cuenta->setSaldo(cuenta->getSaldo() + monto);
+                        cout << "Deposito realizado. Nuevo saldo: $" << cuenta->getSaldo() << endl;
+                    } else {
+                        cout << "Monto invalido." << endl;
+                    }
                     system("pause");
                     break;
-                case 2:
+                }
+                case 2: {
                     system("cls");
-                    cout << "Retirar dinero (simulado)" << endl;
+                    double monto;
+                    cout << "Ingrese monto a retirar: $";
+                    cin >> monto;
+                    if (monto > 0 && monto <= cuenta->getSaldo()) {
+                        cuenta->setSaldo(cuenta->getSaldo() - monto);
+                        cout << "Retiro realizado. Nuevo saldo: $" << cuenta->getSaldo() << endl;
+                    } else {
+                        cout << "Monto invalido o saldo insuficiente." << endl;
+                    }
                     system("pause");
                     break;
+                }
                 case 3:
                     system("cls");
                     cout << "Historial de transacciones (simulado)" << endl;
@@ -137,6 +151,35 @@ void menuTransacciones() {
                     salir = true;
                     break;
             }
+        }
+    }
+}
+
+Cuenta* submenuTipoCuentaUsuario(Cuenta* cuentasUsuario[2], int cuentaCount) {
+    if (cuentaCount == 1) {
+        return cuentasUsuario[0];
+    }
+    int opcion = 0;
+    while (true) {
+        system("cls");
+        cout << "=== Seleccione la cuenta para operar ===" << endl;
+        for (int i = 0; i < cuentaCount; i++) {
+            string tipo = cuentasUsuario[i]->getTipo().getTipo();
+            string id = cuentasUsuario[i]->getIdCuentaStr();
+            if (i == opcion)
+                cout << ">> " << tipo << " | ID: " << id << endl;
+            else
+                cout << "   " << tipo << " | ID: " << id << endl;
+        }
+        int tecla = _getch();
+        if (tecla == 224) {
+            tecla = _getch();
+            if (tecla == 72 && opcion > 0) // Flecha arriba
+                opcion--;
+            else if (tecla == 80 && opcion < cuentaCount - 1) // Flecha abajo
+                opcion++;
+        } else if (tecla == 13) { // Enter
+            return cuentasUsuario[opcion];
         }
     }
 }
@@ -157,68 +200,149 @@ int main() {
         } else if (tecla == 13) { // Enter
             switch (opcion) {
                 case 0: { // Crear nueva cuenta
-                    
                     int tipo = submenuTipoCuenta();
                     if (tipo == 2) // Regresar
                         break;
                     system("cls");
                     string nombre, cedula, direccion;
-                    cout << "Ingrese su cedula: ";
-                    cin >> cedula;
-                    cin.ignore();
-                    cout << "Ingrese su nombre: ";
-                    getline(cin, nombre);
-                    cout << "Ingrese su direccion: ";
-                    getline(cin, direccion);
-
-                    Persona persona(cedula, nombre, direccion);
-                    
+                
+                    // Pedir cédula con validación
+                    while (true) {
+                        cout << "Ingrese su cedula: ";
+                        cedula = "";
+                        char c;
+                        while (true) {
+                            c = _getch();
+                            if (c == 13) { // Enter
+                                cout << endl;
+                                break;
+                            }
+                            if (c == 8) { // Backspace
+                                if (!cedula.empty()) {
+                                    cedula.pop_back();
+                                    cout << "\b \b";
+                                }
+                            } else if (c >= '0' && c <= '9' && cedula.length() < 10) {
+                                cedula += c;
+                                cout << c;
+                            }
+                        }
+                        if (cedula.length() == 10) {
+                            if (validarCedulaEcuatoriana(cedula)) {
+                                break;
+                            } else {
+                                cout << "Cedula invalida. Intente de nuevo." << endl;
+                            }
+                        } else {
+                            cout << "Cedula invalida. Intente de nuevo." << endl;
+                        }
+                    }
+                
+                    // Determinar tipo de cuenta
                     TipoCuenta tipoCuenta(tipo == 0 ? "ahorros" : "corriente");
-                    
-                    if (tipo == 0)
-                        cout << "Seleccionaste cuenta Ahorros." << endl;
-                    else
-                        cout << "Seleccionaste cuenta Corriente." << endl;
-                    
-                    static int idCuenta = 1000;
-                    idCuenta++;
-
+                
+                    // Verificar si ya existe una cuenta de ese tipo para esa cédula
+                    Cuenta* cuentaMismaTipo = listaCuentas.buscarCuentaPorCedulaYTipo(cedula, tipoCuenta.getTipo());
+                    if (cuentaMismaTipo) {
+                        cout << "Ya existe una cuenta de tipo " << tipoCuenta.getTipo() << " para esta cedula." << endl;
+                        system("pause");
+                        break;
+                    }
+                
+                    // Buscar si ya existe alguna cuenta con esa cédula (para usar datos)
+                    Cuenta* cuentaExistente = listaCuentas.buscarCuentaPorCedula(cedula);
+                
+                    string contrasena;
+                    if (cuentaExistente) {
+                        nombre = cuentaExistente->getNombre();
+                        contrasena = cuentaExistente->getContrasena();
+                        cout << "Usuario ya registrado. Se usaran los datos existentes." << endl;
+                    } else {
+                        // Si no existe, pide nombre y dirección y genera contraseña
+                        cout << "Ingrese su nombre: ";
+                        nombre = "";
+                        char c;
+                        while (true) {
+                            c = _getch();
+                            if (c == 13) { // Enter
+                                cout << endl;
+                                if (!nombre.empty()) break;
+                            }
+                            else if (c == 8) { // Backspace
+                                if (!nombre.empty()) {
+                                    nombre.pop_back();
+                                    cout << "\b \b";
+                                }
+                            }
+                            else if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == ' ') {
+                                nombre += c;
+                                cout << c;
+                            }
+                        }
+                        contrasena = ContrasenaUsuario::generarContrasenaBancaria();
+                    }
+                
+                    Persona persona(cedula, nombre);
                     double saldoInicial = 0.0;
-                    Cuenta cuenta(idCuenta, persona, saldoInicial, tipoCuenta);
+                    Cuenta cuenta(persona, saldoInicial, tipoCuenta);
+                    cuenta.setContrasena(contrasena);
                     listaCuentas.insertarCuenta(cuenta);
-
-                    cout << "Cuenta creada exitosamente con ID: " << idCuenta << endl;
-
-                    string contrasena = ContrasenaUsuario::generarContrasenaBancaria();
-                    cout << "Su contraseña bancaria es: " << contrasena << endl;
-
+                
+                    cout << "Cuenta creada exitosamente con ID: " << cuenta.getIdCuentaStr() << endl;
+                    cout << "Su contrasena bancaria es: " << contrasena << endl;
+                
                     system("pause");
                     break;
                 }
                 case 1: { // Iniciar sesion para tramites
                     system("cls");
-                    string cedula, clave;
-                    cout << "Ingrese su cedula: ";
-                    cin >> cedula;
-                    cout << "Ingrese su clave: ";
+                    string cedula, contrasena;
+                    // Pedir cédula
+                    while (true) {
+                        cout << "Ingrese su cedula: ";
+                        cedula = "";
+                        char c;
+                        while (true) {
+                            c = _getch();
+                            if (c == 13) { cout << endl; break; }
+                            if (c == 8) {
+                                if (!cedula.empty()) { cedula.pop_back(); cout << "\b \b"; }
+                            } else if (c >= '0' && c <= '9' && cedula.length() < 10) {
+                                cedula += c; cout << c;
+                            }
+                        }
+                        break;
+                    }
+                    // Pedir contraseña
+                    cout << "Ingrese su contrasena: ";
                     char ch;
-                    clave = "";
-                    while ((ch = _getch()) != 13) { // Enter
-                        if (ch == 8 && !clave.empty()) { // Backspace
-                            clave.pop_back();
-                            cout << "\b \b";
+                    contrasena = "";
+                    while ((ch = _getch()) != 13) {
+                        if (ch == 8 && !contrasena.empty()) {
+                            contrasena.pop_back(); cout << "\b \b";
                         } else if (ch != 8) {
-                            clave += ch;
-                            cout << '*';
+                            contrasena += ch; cout << '*';
                         }
                     }
                     cout << endl;
-                    if (validarUsuario(cedula, clave)) {
-                        menuTransacciones();
-                    } else {
-                        cout << "\nUsuario o clave incorrectos." << endl;
+                
+                    Cuenta* cuentasUsuario[2] = {nullptr, nullptr};
+                    int cuentaCount = listaCuentas.buscarCuentasPorCedulaYContrasena(cedula, contrasena, cuentasUsuario);
+                
+                    if (cuentaCount == 0) {
+                        cout << "\nUsuario o contrasena incorrectos." << endl;
                         system("pause");
+                        break;
                     }
+                
+                    Cuenta* cuentaSeleccionada = nullptr;
+                    if (cuentaCount == 1) {
+                        cuentaSeleccionada = cuentasUsuario[0];
+                    } else {
+                        cuentaSeleccionada = submenuTipoCuentaUsuario(cuentasUsuario, cuentaCount);
+                    }
+                
+                    menuTransacciones(cuentaSeleccionada);
                     break;
                 }
                 case 2:

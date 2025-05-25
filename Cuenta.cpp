@@ -1,20 +1,19 @@
 #include "Cuenta.h"
 #include <iostream>
+#include <sstream>
 #include <set>
+#include <cctype>
 #include <string>
 
 // Variable estática para almacenar los IDs generados
-/*static std::set<std::string> idsGenerados;
+static std::set<std::string> idsGenerados;
 
-std::string Cuenta::getIdCuenta(void)
-{
-    // Generar ID: primera letra del nombre + apellido + número si es necesario
+void Cuenta::generarIdCuenta() {
     std::string nombreCompleto = persona.getNombre();
     std::istringstream iss(nombreCompleto);
     std::string nombre, apellido;
     iss >> nombre >> apellido; // Se asume que siempre hay nombre y apellido
 
-    // Construir el ID base
     std::string idBase = "";
     idBase += toupper(nombre[0]);
     idBase += apellido;
@@ -22,27 +21,18 @@ std::string Cuenta::getIdCuenta(void)
     std::string idGenerado = idBase;
     int contador = 1;
 
-    // Si el ID ya existe, agregar un número al final
-    while (idsGenerados.find(idGenerado) != idsGenerados.end()) { idGenerado = idBase + std::to_string(contador);
+    while (idsGenerados.find(idGenerado) != idsGenerados.end()) {
+        idGenerado = idBase + std::to_string(contador);
         contador++;
     }
 
-    // Guardar el nuevo ID generado
     idsGenerados.insert(idGenerado);
+    idCuenta = idGenerado;
 
-    std::cout << "ID generado para la cuenta: " << idGenerado << std::endl;
-
-    return idCuenta; // Si quieres usar el ID generado como int, puedes hacer un hash aquí
-}*/
-
-int Cuenta::getIdCuenta(void) const
-{
-    return idCuenta;
 }
 
-void Cuenta::setIdCuenta(int newIdCuenta)
-{
-   idCuenta = newIdCuenta;
+std::string Cuenta::getIdCuentaStr(void) {
+    return idCuenta;
 }
 
 std::string Cuenta::getNombre(void) { 
@@ -61,26 +51,34 @@ void Cuenta::setCedula(std::string newCedula) {
    persona.setCedula(newCedula); 
 }
 
-double Cuenta::getSaldo(void)
-{
+double Cuenta::getSaldo(void) {
    return saldo;
 }
 
-void Cuenta::setSaldo(double newSaldo)
-{
+void Cuenta::setSaldo(double newSaldo) {
    saldo = newSaldo;
 }
 
-Cuenta::Cuenta(int id, const Persona& persona, double saldo, TipoCuenta tipo) : idCuenta(id), persona(persona), saldo(saldo), tipo(tipo) {}
+// Constructor corregido: NO recibe id, el id se genera con generarIdCuenta()
+Cuenta::Cuenta(const Persona& persona, double saldo, TipoCuenta tipo)
+    : persona(persona), saldo(saldo), tipo(tipo) {
+    generarIdCuenta();
+}
 
-Cuenta::~Cuenta(){}
+Cuenta::~Cuenta() {}
 
-TipoCuenta Cuenta::getTipo(void)
-{
+TipoCuenta Cuenta::getTipo(void) {
    return tipo;
 }
 
-void Cuenta::setTipo(TipoCuenta newTipo)
-{
+void Cuenta::setTipo(TipoCuenta newTipo) {
    tipo = newTipo;
+}
+
+void Cuenta::setContrasena(const std::string& contrasena) {
+    this->contrasena = contrasena;
+}
+
+std::string Cuenta::getContrasena() const {
+    return contrasena;
 }

@@ -56,7 +56,7 @@ void VentanaAyuda::Crear(HINSTANCE hInstance) {
             L"BUTTON", modulos[i],
             WS_VISIBLE | WS_CHILD | BS_LEFT,
             10, 10 + i * (btnHeight + 5), btnWidth, btnHeight,
-            hwndAyuda, (HMENU)(100 + i), hInstance, NULL
+            hwndAyuda, (HMENU)(UINT_PTR)(100 + i), hInstance, NULL
         );
     }
 

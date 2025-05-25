@@ -37,7 +37,7 @@ int ingresoDatos(char mensaje[20])
     return valor;
 }
 
-bool Validar::validarCedulaEcuatoriana(const std::string& cedula) {
+bool validarCedulaEcuatoriana(const std::string& cedula) {
     if (cedula.length() != 10) return false;
 
     for (char c : cedula) {
