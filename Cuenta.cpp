@@ -34,7 +34,7 @@ std::string Cuenta::getIdCuentaStr(void) {
     return idCuenta;
 }
 
-std::string Cuenta::getNombre(void) { 
+std::string Cuenta::getNombre(void) const { 
    return persona.getNombre(); 
 }
 
@@ -42,7 +42,7 @@ void Cuenta::setNombre(std::string newNombre) {
    persona.setNombre(newNombre); 
 }
 
-std::string Cuenta::getApellido(void) { 
+std::string Cuenta::getApellido(void) const { 
    return persona.getApellido(); 
 }
 
@@ -50,10 +50,10 @@ void Cuenta::setApellido(std::string newApellido) {
    persona.setApellido(newApellido); 
 }
 
-std::string Cuenta::getCedula(void) { 
+std::string Cuenta::getCedula(void) const { 
    return persona.getCedula(); 
 }
-std::string Cuenta::getIdCuenta(void) { 
+std::string Cuenta::getIdCuenta() const { 
    return idCuenta; 
 }
 
@@ -61,7 +61,7 @@ void Cuenta::setCedula(std::string newCedula) {
    persona.setCedula(newCedula); 
 }
 
-double Cuenta::getSaldo(void) {
+double Cuenta::getSaldo(void) const {
    return saldo;
 }
 
@@ -78,7 +78,7 @@ Cuenta::Cuenta(const Persona& persona, double saldo, TipoCuenta tipo)
 
 Cuenta::~Cuenta() {}
 
-TipoCuenta Cuenta::getTipo(void) {
+TipoCuenta Cuenta::getTipo(void) const {
    return tipo;
 }
 

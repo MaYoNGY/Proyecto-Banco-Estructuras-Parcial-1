@@ -454,6 +454,95 @@ Cuenta* submenuTipoCuentaUsuario(Cuenta* cuentasUsuario[2], int cuentaCount) {
     }
 }
 
+void menuConsultasAvanzadas() {
+    int opcion = 0;
+    string opciones[] = {
+        "1. Buscar cuenta por nombre y apellido",
+        "2. Buscar cuenta por ID",
+        "3. Buscar cuenta por cedula",
+        "4. Buscar transacciones por fecha",
+        "5. Buscar transacciones por cuenta y fecha",
+        "6. Regresar"
+    };
+    bool regresar = false;
+    while (!regresar) {
+        system("cls");
+        cout << "===== Consultas Avanzadas =====" << endl;
+        for (int i = 0; i < 6; i++) {
+            if (i == opcion)
+                cout << ">> " << opciones[i] << endl;
+            else
+                cout << "   " << opciones[i] << endl;
+        }
+        int tecla = _getch();
+        if (tecla == 224) {
+            tecla = _getch();
+            if (tecla == 72) { // Flecha arriba
+            if (opcion > 0)
+                opcion--;
+            else
+                opcion = 5; // Si está en la primera opción, va a la última
+            } else if (tecla == 80) { // Flecha abajo
+            if (opcion < 5)
+                opcion++;
+            else
+            opcion = 0; // Si está en la última opción, va a la primera
+            }
+        } else if (tecla == 13) {
+            system("cls");
+            switch (opcion) {
+                case 0: { // Buscar por nombre
+
+                    string nombre = Validar::pedirNombre() + " " + Validar::pedirApellido();
+                    listaCuentas.buscarCuentasPorNombre(nombre); // Debes implementar este método en ListaCuenta
+                    system("pause");
+                    break;
+                }
+
+                case 1: { // Buscar por ID
+                    string idStr = Validar::pedirIdCuenta();
+                    Cuenta* cuenta = listaCuentas.buscarCuentaPorId(idStr); // Debes implementar este método en ListaCuenta
+                    if (cuenta) {
+                        listaCuentas.mostrarCuentaPorId(idStr); // Solo muestra la cuenta encontrada
+                    } else {
+                        cout << "No se encontro ninguna cuenta con ese ID." << endl;
+                    }
+                    system("pause");
+                    break;
+                }
+                case 2: { // Buscar por cedula
+                    string cedula = Validar::pedirCedula();
+                    listaCuentas.buscarCuentasPorCedula(cedula); // Debes implementar este método en ListaCuenta
+                    system("pause");
+                    break;
+                }
+                case 3: { // Buscar transacciones por fecha
+                    Fecha fecha = Validar::pedirFecha();
+                    listaTransacciones.mostrarTransaccionesPorFecha(fecha.getDia(), fecha.getMes(), fecha.getAnio());
+                    system("pause");
+                    break;
+                }
+                case 4: { // Buscar transacciones por cuenta y fecha
+                    cout << "Ingrese el ID de la cuenta: ";
+                    string idStr = Validar::pedirIdCuenta();
+                    Cuenta* cuenta = listaCuentas.buscarCuentaPorId(idStr); // Debes implementar este método en ListaCuenta
+                    if (cuenta) {
+                        listaCuentas.mostrarCuentaPorId(idStr); // Asegúrate de tener este método en Cuenta
+                    } else {
+                        cout << "No se encontro ninguna cuenta con ese ID." << endl;
+                    }
+                    Fecha fecha = Validar::pedirFecha();
+                    listaTransacciones.mostrarTransaccionesPorFecha(fecha.getDia(), fecha.getMes(), fecha.getAnio());
+                    system("pause");
+                    break;
+                }
+                case 5: // Regresar
+                    regresar = true;
+                    break;
+            }
+        }
+    }
+}
 
 int main() {
     // Cargar cuentas desde el archivo si existe
@@ -559,8 +648,7 @@ int main() {
                 }
                 case 2:
                     system("cls");
-                    cout << "Consultas avanzadas (no implementado)." << endl;
-                    
+                    menuConsultasAvanzadas();
                     system("pause");
                     break;
                 case 3:

@@ -120,22 +120,42 @@ public:
 }
 
 
-   // Buscar transacciones por id de cuenta y fecha
-   std::vector<T> buscarTransaccionesPorCuentaYFecha(int idCuenta, int dia, int mes, int anio) const {
-      std::vector<T> resultados;
-      if (!cabeza) return resultados;
-      NodoTransaccion<T>* actual = cabeza;
-      do {
-         const T& trans = actual->getDato();
-         if (trans.getCuenta().getIdCuenta() == idCuenta &&
-             trans.getFecha().getDia() == dia &&
-             trans.getFecha().getMes() == mes &&
-             trans.getFecha().getAnio() == anio) {
-            resultados.push_back(trans);
-         }
-         actual = actual->getSiguiente();
-      } while (actual != cabeza);
-      return resultados;
+      void mostrarTransaccionesPorFecha(int dia, int mes, int anio) const {
+       if (!cabeza) {
+           std::cout << "No hay transacciones en la lista." << std::endl;
+           return;
+       }
+   
+       bool encontrado = false;
+       NodoTransaccion<T>* actual = cabeza;
+       do {
+           T trans = actual->getDato();
+           auto cuenta = trans.getCuenta();
+           auto tipoCuenta = cuenta.getTipo();
+           auto tipoTrans = trans.getTipoTransaccion();
+           auto fecha = trans.getFecha();
+   
+           if (fecha.getDia() == dia && fecha.getMes() == mes && fecha.getAnio() == anio) {
+               std::cout << "Cuenta ID: " << cuenta.getIdCuenta()
+                   << ", Nombre: " << cuenta.getNombre()
+                   << ", Cedula: " << cuenta.getCedula()
+                   << ", Tipo de Cuenta: " << tipoCuenta.getTipo()
+                   << ", Saldo: " << cuenta.getSaldo()
+                   << ", Tipo de Transaccion: " << tipoTrans.getTipo()
+                   << ", Monto: " << trans.getMonto()
+                   << ", Fecha: " << fecha.getDia() << "/"
+                   << fecha.getMes() << "/"
+                   << fecha.getAnio()
+                   << std::endl;
+               encontrado = true;
+           }
+   
+           actual = actual->getSiguiente();
+       } while (actual != cabeza);
+   
+       if (!encontrado) {
+           std::cout << "No se encontraron transacciones para esa fecha." << std::endl;
+       }
    }
 
     

@@ -272,6 +272,100 @@ public:
       }
       archivo.close();
    }
+
+void buscarCuentasPorNombre(const std::string& nombreCompleto) const {
+    if (!cabeza) {
+        std::cout << "No hay cuentas en la lista." << std::endl;
+        return;
+    }
+    NodoCuenta<T>* actual = cabeza;
+    bool encontrada = false;
+    do {
+        std::string nombreCuenta = actual->getDato().getNombre() + " " + actual->getDato().getApellido();
+        if (nombreCuenta == nombreCompleto) {
+            std::cout << "ID: " << actual->getDato().getIdCuenta()
+                    << ", Cedula: " << actual->getDato().getCedula()
+                    << ", Nombre: " << actual->getDato().getNombre()
+                    << ", Apellido: " << actual->getDato().getApellido()
+                    << ", Saldo: " << actual->getDato().getSaldo()
+                    << ", Tipo: " << actual->getDato().getTipo().getTipo()
+                    << std::endl;
+            encontrada = true;
+        }
+        actual = actual->getSiguiente();
+    } while (actual != cabeza);
+    if (!encontrada) {
+        std::cout << "No se encontraron cuentas con ese nombre y apellido." << std::endl;
+    }
+}
+
+// Buscar cuenta por ID (retorna puntero a Cuenta o nullptr)
+T* buscarCuentaPorId(const std::string& id) const {
+    if (!cabeza) return nullptr;
+    NodoCuenta<T>* actual = cabeza;
+    do {
+        if (actual->getDato().getIdCuenta() == id) {
+            return &(actual->getDato());
+        }
+        actual = actual->getSiguiente();
+    } while (actual != cabeza);
+    return nullptr;
+}
+
+// Buscar y mostrar cuentas por cédula
+void buscarCuentasPorCedula(const std::string& cedula) const {
+    if (!cabeza) {
+        std::cout << "No hay cuentas en la lista." << std::endl;
+        return;
+    }
+    NodoCuenta<Cuenta>* actual = cabeza;
+    bool encontradas = false;
+    do {
+        if (actual->getDato().getCedula() == cedula) {
+            std::cout << "ID: " << actual->getDato().getIdCuenta()
+                      << ", Cedula: " << actual->getDato().getCedula()
+                      << ", Nombre: " << actual->getDato().getNombre()
+                      << ", Apellido: " << actual->getDato().getApellido()
+                      << ", Saldo: " << actual->getDato().getSaldo()
+                      << ", Tipo: " << actual->getDato().getTipo().getTipo()
+                      << std::endl;
+            encontradas = true;
+        }
+        actual = actual->getSiguiente();
+    } while (actual != cabeza);
+    if (!encontradas) {
+        std::cout << "No se encontraron cuentas con esa cedula." << std::endl;
+    }
+}
+
+
+void mostrarCuentaPorId(const std::string& id) const {
+    if (!cabeza) {
+        std::cout << "No hay cuentas en la lista." << std::endl;
+        return;
+    }
+    NodoCuenta<T>* actual = cabeza; // Usa T, no Cuenta
+    bool encontrada = false;
+    do {
+        if (actual->getDato().getIdCuenta() == id) {
+            const T& cuenta = actual->getDato();
+            std::cout << "ID: " << cuenta.getIdCuenta()
+                    << ", Cedula: " << cuenta.getCedula()
+                    << ", Nombre: " << cuenta.getNombre()
+                    << ", Apellido: " << cuenta.getApellido()
+                    << ", Saldo: " << cuenta.getSaldo()
+                    << ", Tipo: " << cuenta.getTipo().getTipo()
+                    << std::endl;
+            encontrada = true;
+            break;
+        }
+        actual = actual->getSiguiente();
+    } while (actual != cabeza);
+    if (!encontrada) {
+        std::cout << "No se encontro ninguna cuenta con ese ID." << std::endl;
+    }
+}
+
 };
 
 #endif

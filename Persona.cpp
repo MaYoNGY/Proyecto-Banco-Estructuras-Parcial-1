@@ -2,7 +2,7 @@
 #include "Persona.h"
 #include <string>
 
-std::string Persona::getCedula(void)
+std::string Persona::getCedula(void) const
 {
     return cedula;
 }
@@ -12,7 +12,7 @@ void Persona::setCedula(std::string newCedula)
    cedula = newCedula;
 }
 
-std::string Persona::getNombre(void)
+std::string Persona::getNombre(void) const
 {
    return nombre;
 }
@@ -22,7 +22,7 @@ void Persona::setNombre(std::string newNombre)
    nombre = newNombre;
 }
 
-std::string Persona::getApellido(void)
+std::string Persona::getApellido(void) const
 {
    return apellido;
 }

@@ -22,16 +22,16 @@ public:
    std::string getIdCuentaStr(void);
    void generarIdCuenta();
 
-   std::string getNombre(void);
+   std::string getNombre(void) const;
    void setNombre(std::string newNombre);
-   std::string getApellido(void);
+   std::string getApellido(void) const;
    void setApellido(std::string newApellido);
-   std::string getCedula(void);
+   std::string getCedula(void) const;
    void setCedula(std::string newCedula);
-   std::string getIdCuenta(void);
+   std::string getIdCuenta(void) const;
    void setIdCuenta(std::string newIdCuenta);
 
-   double getSaldo(void);
+   double getSaldo(void) const;
    void setSaldo(double newSaldo);
 
    void setContrasena(const std::string& contrasena);
@@ -42,7 +42,7 @@ public:
       : idCuenta(idCuenta), persona(persona), saldo(saldo), tipo(tipo), contrasena(contrasena), fechaCreacion(fechaCreacion) {}
    ~Cuenta();
 
-   TipoCuenta getTipo(void);
+   TipoCuenta getTipo(void) const;
    void setTipo(TipoCuenta newTipo);
 
    void setFechaCreacion(const Fecha& fecha);

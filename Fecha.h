@@ -18,7 +18,7 @@ public:
     int getAnio(void);
     void setAnio(int newAnio);
     void inicializarConFechaActual();
-    bool validarFecha(int dia, int mes, int anio);
+   static bool validarFecha(int dia, int mes, int anio);
     bool diaLaboral(int dia, int mes, int anio);
     bool feriado(int dia, int mes, int anio);
    
