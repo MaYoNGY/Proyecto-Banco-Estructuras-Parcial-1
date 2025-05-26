@@ -179,6 +179,11 @@ public:
        } while (actual != cabeza);
        return false;
    }
+
+   // Método para obtener el puntero al primer nodo (cabeza)
+   NodoCuenta<T>* getNodoCabeza() const {
+      return cabeza;
+   }
 };
 
 #endif

@@ -52,27 +52,64 @@ public:
       return nullptr;
    }
 
-   void mostrarTransacciones() const {
-       if (!cabeza) {
-           std::cout << "No hay transacciones en la lista." << std::endl;
-           return;
-       }
-       NodoTransaccion<T>* actual = cabeza;
-       do {
-           std::cout << "Cuenta ID: " << actual->getDato().getCuenta().getIdCuenta()
-                     << ", Nombre: " << actual->getDato().getCuenta().getNombre()
-                     << ", Cedula: " << actual->getDato().getCuenta().getCedula()
-                     << ", Tipo de Cuenta: " << actual->getDato().getCuenta().getTipo().getTipo()
-                     << ", Saldo: " << actual->getDato().getCuenta().getSaldo()
-                     << ", Tipo de Transacción: " << actual->getDato().getTipoTransaccion().getTipo()
-                     << ", Monto: " << actual->getDato().getMonto()
-                     << ", Fecha: " << actual->getDato().getFecha().getDia() << "/"
-                     << actual->getDato().getFecha().getMes() << "/"
-                     << actual->getDato().getFecha().getAnio()
-                     << std::endl;
-           actual = actual->getSiguiente();
-       } while (actual != cabeza);
-   }
+   void mostrarTransacciones(string tipo) const {
+
+    if (!cabeza) {
+        std::cout << "No hay transacciones en la lista." << std::endl;
+        return;
+    }
+    
+    NodoTransaccion<T>* actual = cabeza;
+    do {
+        T trans = actual->getDato();  // copia
+        auto cuenta = trans.getCuenta();  // copia
+        auto tipoCuenta = cuenta.getTipo();  // copia
+        auto tipoTrans = trans.getTipoTransaccion();  // copia
+        auto fecha = trans.getFecha();  // copia
+
+        while (tipo =="ahorro" && tipoTrans.getTipo() == "Consulta de saldo-ahorro"
+            || tipoTrans.getTipo() == "Deposito-ahorro"
+            || tipoTrans.getTipo() == "Retiro-ahorro") {
+            std::cout << "Cuenta ID: " << cuenta.getIdCuenta()
+            << ", Nombre: " << cuenta.getNombre()
+            << ", Cedula: " << cuenta.getCedula()
+            << ", Tipo de Cuenta: " << tipoCuenta.getTipo()
+            << ", Saldo: " << cuenta.getSaldo()
+            << ", Tipo de Transaccion: " << tipoTrans.getTipo()
+            << ", Monto: " << trans.getMonto()
+            << ", Fecha: " << fecha.getDia() << "/"
+            << fecha.getMes() << "/"
+            << fecha.getAnio()
+            << std::endl;
+            break;  // Salir del bucle si se encuentra una transacción de ahorro
+        }
+
+      while (tipo != "ahorro" && tipoTrans.getTipo() == "Consulta de saldo-corriente"
+            || tipoTrans.getTipo() == "Deposito-corriente"
+            || tipoTrans.getTipo() == "Retiro-corriente"
+            || tipoTrans.getTipo() == "Estado de sobregiro-corriente"
+            || tipoTrans.getTipo() == "Calculo de interes de sobregiro-corriente"
+            || tipoTrans.getTipo() == "Pago de sobregiro-corriente") {
+            std::cout << "Cuenta ID: " << cuenta.getIdCuenta()
+            << ", Nombre: " << cuenta.getNombre()
+            << ", Cedula: " << cuenta.getCedula()
+            << ", Tipo de Cuenta: " << tipoCuenta.getTipo()
+            << ", Saldo: " << cuenta.getSaldo()
+            << ", Tipo de Transaccion: " << tipoTrans.getTipo()
+            << ", Monto: " << trans.getMonto()
+            << ", Fecha: " << fecha.getDia() << "/"
+            << fecha.getMes() << "/"
+            << fecha.getAnio()
+            << std::endl;  
+            break;
+         }
+            actual = actual->getSiguiente();
+      
+      
+
+    } while (actual != cabeza);
+}
+
 
    // Buscar transacciones por id de cuenta y fecha
    std::vector<T> buscarTransaccionesPorCuentaYFecha(int idCuenta, int dia, int mes, int anio) const {

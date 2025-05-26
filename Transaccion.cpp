@@ -32,6 +32,10 @@ void Transaccion::setFecha(Fecha newFecha) {
    fecha = newFecha; 
 }
 
+Fecha Transaccion::getFecha(void) { 
+   return fecha; 
+}
+
 Transaccion::Transaccion(const Cuenta& cuenta, const TipoTransaccion& tipo, double monto, const Fecha& fecha) : cuenta(cuenta), tipoTransaccion(tipo), monto(monto), fecha(fecha) {}
 
 Transaccion::~Transaccion() {}

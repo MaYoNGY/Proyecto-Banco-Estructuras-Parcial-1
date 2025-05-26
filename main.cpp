@@ -17,9 +17,14 @@
 #include "ContrasenaUsuario.cpp"
 #include "Fecha.cpp"
 #include "OperacionCuenta.cpp"
+#include "ListaTransaccion.h"
+#include "Transaccion.cpp"
+#include "TipoTransaccion.cpp"
+
 using namespace std;
 
 ListaCuenta<Cuenta> listaCuentas;
+ListaTransaccion<Transaccion> listaTransacciones;
 
 // Función para mover el cursor a una posición específica
 void gotoxy(int x, int y) {
@@ -152,32 +157,52 @@ void menuTransacciones(Cuenta* cuenta) {
         } else if (tecla == 13) {
             if (!esCorriente) {
                 switch (opcion) {
-                    case 0:
+                    case 0:{
                         system("cls");
                         cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
+                        cout <<"tipo de transaccion: consulta de saldo" << endl;
+                        cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
+                             << cuenta->getFechaCreacion().getMes() << "/" 
+                             << cuenta->getFechaCreacion().getAnio() << endl;
+                        Transaccion transaccion(*cuenta, TipoTransaccion("Consulta de saldo-ahorro"), cuenta->getSaldo(), cuenta->getFechaCreacion());
+                        listaTransacciones.insertarTransaccion(transaccion);
                         system("pause");
-                        break;
+                    break;
+                    }
                     case 1: {
                         system("cls");
-                        double monto = pedirMontoSeguro("Ingrese monto a depositar: $");
-                        operacion += monto;
+                        if(double monto = pedirMontoSeguro("Ingrese monto a depositar: $")){
+                            operacion += monto;
+                                                    cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
+                            << cuenta->getFechaCreacion().getMes() << "/" 
+                            << cuenta->getFechaCreacion().getAnio() << endl;
+                            Transaccion transaccion(*cuenta, TipoTransaccion("Deposito-ahorro"), monto, cuenta->getFechaCreacion());
+                            listaTransacciones.insertarTransaccion(transaccion);
+                        }
                         system("pause");
                         break;
                     }
                     case 2: {
                         system("cls");
-                        double monto = pedirMontoSeguro("Ingrese monto a retirar: $");
-                        // Llama a la nueva función para retiro en cuenta de ahorro
+                        if(double monto = pedirMontoSeguro("Ingrese monto a retirar: $")){
                         operacion.retirarAhorroSimple(monto);
                         cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
+                        cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
+                             << cuenta->getFechaCreacion().getMes() << "/" 
+                             << cuenta->getFechaCreacion().getAnio() << endl;
+                        Transaccion transaccion(*cuenta, TipoTransaccion("Retiro-ahorro"), monto, cuenta->getFechaCreacion());
+                        listaTransacciones.insertarTransaccion(transaccion);
+                        }
                         system("pause");
                         break;
                     }
-                    case 3:
+                    case 3:{
                         system("cls");
-                        cout << "Historial de transacciones (simulado)" << endl;
+                        cout << "Historial de transacciones" << endl;
+                        listaTransacciones.mostrarTransacciones("ahorro");
                         system("pause");
                         break;
+                    }
                     case 4:
                         regresar = true;
                         break;
@@ -230,41 +255,69 @@ void menuTransacciones(Cuenta* cuenta) {
                 }
             } else {
                 switch (opcion) {
-                    case 0:
+                    case 0:{
                         system("cls");
                         cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
+                        cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
+                             << cuenta->getFechaCreacion().getMes() << "/" 
+                             << cuenta->getFechaCreacion().getAnio() << endl;
+                        Transaccion transaccion(*cuenta, TipoTransaccion("Consulta de saldo-corriente"), cuenta->getSaldo(), cuenta->getFechaCreacion());
+                        listaTransacciones.insertarTransaccion(transaccion);
                         system("pause");
-                        break;
+                        break;}
                     case 1: {
                         system("cls");
-                        double monto = pedirMontoSeguro("Ingrese monto a depositar: $");
+                        if(double monto = pedirMontoSeguro("Ingrese monto a depositar: $")){
                         operacion += monto;
+                        cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
+                             << cuenta->getFechaCreacion().getMes() << "/" 
+                             << cuenta->getFechaCreacion().getAnio() << endl;
+                        Transaccion transaccion(*cuenta, TipoTransaccion("Deposito-corriente"), monto, cuenta->getFechaCreacion());
+                        listaTransacciones.insertarTransaccion(transaccion);
+                        cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
+                        }
                         system("pause");
                         break;
                     }
                     case 2: {
                         system("cls");
-                        double monto = pedirMontoSeguro("Ingrese monto a retirar: $");
-                        operacion -= monto;
+                        if(double monto = pedirMontoSeguro("Ingrese monto a retirar: $")){
+                        operacion -= monto;   
                         cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
+                        cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
+                             << cuenta->getFechaCreacion().getMes() << "/" 
+                             << cuenta->getFechaCreacion().getAnio() << endl;
+                        Transaccion transaccion(*cuenta, TipoTransaccion("Retiro-corriente"), monto, cuenta->getFechaCreacion());
+                        listaTransacciones.insertarTransaccion(transaccion);
+                        }
                         system("pause");
-                        break;
-                    }
-                    case 3:
+                    } 
+                    case 3:{
                         system("cls");
-                        cout << "Historial de transacciones (simulado)" << endl;
+                        cout << "Historial de transacciones" << endl;
+                        listaTransacciones.mostrarTransacciones("corriente");
                         system("pause");
-                        break;
-                    case 4:
+                        break;}
+                    case 4:{
                         system("cls");
                         operacion.mostrarEstadoSobregiro();
+                        cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
+                             << cuenta->getFechaCreacion().getMes() << "/" 
+                             << cuenta->getFechaCreacion().getAnio() << endl;
+                        Transaccion transaccion(*cuenta, TipoTransaccion("Estado de sobregiro-corriente"), 0, cuenta->getFechaCreacion());
+                        listaTransacciones.insertarTransaccion(transaccion);
                         system("pause");
-                        break;
-                    case 5:
+                        break;}
+                    case 5:{
                         system("cls");
                         operacion.calcularInteresSobregiro();
+                        cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
+                             << cuenta->getFechaCreacion().getMes() << "/" 
+                             << cuenta->getFechaCreacion().getAnio() << endl;
+                        Transaccion transaccion(*cuenta, TipoTransaccion("Calculo de interes de sobregiro-corriente"), 0, cuenta->getFechaCreacion());
+                        listaTransacciones.insertarTransaccion(transaccion);
                         system("pause");
-                        break;
+                        break;}
                     case 6: {
                         system("cls");
                         // Solo permite pagar hasta el monto pendiente de sobregiro
@@ -277,17 +330,25 @@ void menuTransacciones(Cuenta* cuenta) {
                             // Usamos un cast a double para acceder al atributo privado (no hay getter, así que mejor pedirlo al usuario y validar en pagarSobregiro)
                             if (montoPagar > 0 && montoPagar <= 5000) { // 5000 es arbitrario, el método ya valida el monto real
                                 operacion.pagarSobregiro(montoPagar);
+                                cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
+                                cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
+                                    << cuenta->getFechaCreacion().getMes() << "/" 
+                                    << cuenta->getFechaCreacion().getAnio() << endl;
+                                Transaccion transaccion(*cuenta, TipoTransaccion("Pago de sobregiro-corriente"), montoPagar, cuenta->getFechaCreacion());
+                                listaTransacciones.insertarTransaccion(transaccion);
                                 break;
                             } else {
                                 cout << "Monto invalido. Intente de nuevo: $";
                             }
                         }
+
                         system("pause");
                         break;
                     }
                     case 7:
                         regresar = true;
                         break;
+                        
                     case 8: { // Eliminar cuenta
                         int confirmOpcion = 0;
                         string opcionesConfirm[] = {"Confirmar eliminacion", "Regresar"};

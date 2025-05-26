@@ -2,9 +2,9 @@
 #define __TRANSACCION_H
 #include <iostream>
 #include <string>
-#include <Fecha.h>
-#include <TipoTransaccion.h>
-#include <Cuenta.h>
+#include  "Fecha.h"
+#include "TipoTransaccion.h"
+#include "Cuenta.h"
 
 class Transaccion
 {
