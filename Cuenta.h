@@ -38,6 +38,8 @@ public:
     std::string getContrasena() const;
 
    Cuenta(const Persona& persona, double saldo, TipoCuenta tipo);
+   Cuenta(const std::string& idCuenta, const Persona& persona, double saldo, const TipoCuenta& tipo, const std::string& contrasena, const Fecha& fechaCreacion)
+      : idCuenta(idCuenta), persona(persona), saldo(saldo), tipo(tipo), contrasena(contrasena), fechaCreacion(fechaCreacion) {}
    ~Cuenta();
 
    TipoCuenta getTipo(void);

@@ -3,6 +3,12 @@
 #include <iostream>
 #include <string>
 #include "NodoCuenta.h"
+#include <fstream>
+#include <sstream>
+#include "Cuenta.h"
+#include "Persona.h"
+#include "TipoCuenta.h"
+#include "Fecha.h"
 
 template <typename T>
 class ListaCuenta
@@ -183,6 +189,88 @@ public:
    // Método para obtener el puntero al primer nodo (cabeza)
    NodoCuenta<T>* getNodoCabeza() const {
       return cabeza;
+   }
+
+   // Método para guardar todas las cuentas en un archivo txt
+   void guardarCuentasEnArchivo(const std::string& nombreArchivo) {
+      std::ofstream archivo(nombreArchivo, std::ios::out);
+      if (!archivo) {
+         std::cerr << "Error al abrir el archivo " << nombreArchivo << " para escritura.\n";
+         return;
+      }
+      NodoCuenta<T>* actual = cabeza;
+      if (!actual) {
+         archivo.close();
+         return;
+      }
+      do {
+         archivo << actual->getDato().getIdCuenta() << " "
+                 << actual->getDato().getCedula() << " "
+                 << actual->getDato().getNombre() << " "
+                 << actual->getDato().getApellido() << " "
+                 << actual->getDato().getTipo().getTipo() << " "
+                 << actual->getDato().getContrasena() << " "
+                 << actual->getDato().getFechaCreacion().getDia() << " "
+                 << actual->getDato().getFechaCreacion().getMes() << " "
+                 << actual->getDato().getFechaCreacion().getAnio()
+                 << std::endl;
+         actual = actual->getSiguiente();
+      } while (actual != cabeza);
+      archivo.close();
+   }
+
+   // Limpia la lista antes de cargar para evitar duplicados
+   void limpiarLista() {
+      NodoCuenta<T>* actual = cabeza;
+      if (!actual) return;
+      do {
+         NodoCuenta<T>* temp = actual;
+         actual = actual->getSiguiente();
+         delete temp;
+      } while (actual != cabeza);
+      cabeza = nullptr;
+      cola = nullptr;
+   }
+
+   // Método robusto para cargar cuentas desde un archivo txt
+   void cargarCuentasDesdeArchivo(const std::string& nombreArchivo) {
+      std::ifstream archivo(nombreArchivo);
+      if (!archivo.is_open()) {
+         std::cerr << "Error al abrir el archivo " << nombreArchivo << " para lectura.\n";
+         return;
+      }
+
+      limpiarLista(); // Limpia la lista antes de cargar
+
+      std::string linea;
+      while (std::getline(archivo, linea)) {
+         if (linea.empty()) continue;
+         std::istringstream iss(linea);
+         std::string idCuenta, cedula, nombre, apellido, tipo, contrasena;
+         double saldo;
+         int dia, mes, anio;
+
+         // Lee los campos en el mismo orden en que se guardaron
+         if (!(iss >> idCuenta >> cedula >> nombre >> apellido >>  tipo >> contrasena >> dia >> mes >> anio)) {
+            std::cerr << "Error de formato en la línea: " << linea << std::endl;
+            continue;
+         }
+
+         // Validación básica de datos
+         if (idCuenta.empty() || cedula.empty() || nombre.empty() || apellido.empty() || tipo.empty() || contrasena.empty())
+            continue;
+
+         Fecha fechaCreacion;
+         fechaCreacion.setDia(dia);
+         fechaCreacion.setMes(mes);
+         fechaCreacion.setAnio(anio);
+
+         TipoCuenta tipoCuenta(tipo);
+         Persona persona(cedula, nombre, apellido);
+         Cuenta cuenta(idCuenta, persona, saldo, tipoCuenta, contrasena, fechaCreacion);
+         insertarCuenta(cuenta);
+      }
+      archivo.close();
    }
 };
 

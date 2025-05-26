@@ -20,6 +20,7 @@
 #include "ListaTransaccion.h"
 #include "Transaccion.cpp"
 #include "TipoTransaccion.cpp"
+#include "CuentaBinario.h"
 
 using namespace std;
 
@@ -52,10 +53,11 @@ void imprimirMenu(int opcionSeleccionada) {
         "5. Restaurar Backup",
         "6. Cifrado de datos",
         "7. Descifrado de datos",
-        "8. Ayuda",
-        "9. Salir"
+        "8. Generar archivo binario",
+        "9. Ayuda",
+        "10. Salir"
     };
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < 10; i++) {
         if (i == opcionSeleccionada)
             cout << ">> " << opciones[i] << endl;
         else
@@ -166,6 +168,7 @@ void menuTransacciones(Cuenta* cuenta) {
                              << cuenta->getFechaCreacion().getAnio() << endl;
                         Transaccion transaccion(*cuenta, TipoTransaccion("Consulta de saldo-ahorro"), cuenta->getSaldo(), cuenta->getFechaCreacion());
                         listaTransacciones.insertarTransaccion(transaccion);
+                        
                         system("pause");
                     break;
                     }
@@ -178,6 +181,7 @@ void menuTransacciones(Cuenta* cuenta) {
                             << cuenta->getFechaCreacion().getAnio() << endl;
                             Transaccion transaccion(*cuenta, TipoTransaccion("Deposito-ahorro"), monto, cuenta->getFechaCreacion());
                             listaTransacciones.insertarTransaccion(transaccion);
+                            
                         }
                         system("pause");
                         break;
@@ -192,6 +196,7 @@ void menuTransacciones(Cuenta* cuenta) {
                              << cuenta->getFechaCreacion().getAnio() << endl;
                         Transaccion transaccion(*cuenta, TipoTransaccion("Retiro-ahorro"), monto, cuenta->getFechaCreacion());
                         listaTransacciones.insertarTransaccion(transaccion);
+                        
                         }
                         system("pause");
                         break;
@@ -242,6 +247,7 @@ void menuTransacciones(Cuenta* cuenta) {
                                     if (eliminada) {
                                         cout << "Cuenta eliminada exitosamente." << endl;
                                         cuentaEliminada = true;
+                                        listaCuentas.guardarCuentasEnArchivo("cuentas.txt");
                                     } else {
                                         cout << "No se pudo eliminar la cuenta." << endl;
                                     }
@@ -263,6 +269,7 @@ void menuTransacciones(Cuenta* cuenta) {
                              << cuenta->getFechaCreacion().getAnio() << endl;
                         Transaccion transaccion(*cuenta, TipoTransaccion("Consulta de saldo-corriente"), cuenta->getSaldo(), cuenta->getFechaCreacion());
                         listaTransacciones.insertarTransaccion(transaccion);
+                        
                         system("pause");
                         break;}
                     case 1: {
@@ -274,6 +281,7 @@ void menuTransacciones(Cuenta* cuenta) {
                              << cuenta->getFechaCreacion().getAnio() << endl;
                         Transaccion transaccion(*cuenta, TipoTransaccion("Deposito-corriente"), monto, cuenta->getFechaCreacion());
                         listaTransacciones.insertarTransaccion(transaccion);
+                        
                         cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
                         }
                         system("pause");
@@ -289,6 +297,7 @@ void menuTransacciones(Cuenta* cuenta) {
                              << cuenta->getFechaCreacion().getAnio() << endl;
                         Transaccion transaccion(*cuenta, TipoTransaccion("Retiro-corriente"), monto, cuenta->getFechaCreacion());
                         listaTransacciones.insertarTransaccion(transaccion);
+                        
                         }
                         system("pause");
                     } 
@@ -306,6 +315,7 @@ void menuTransacciones(Cuenta* cuenta) {
                              << cuenta->getFechaCreacion().getAnio() << endl;
                         Transaccion transaccion(*cuenta, TipoTransaccion("Estado de sobregiro-corriente"), 0, cuenta->getFechaCreacion());
                         listaTransacciones.insertarTransaccion(transaccion);
+                        
                         system("pause");
                         break;}
                     case 5:{
@@ -316,8 +326,10 @@ void menuTransacciones(Cuenta* cuenta) {
                              << cuenta->getFechaCreacion().getAnio() << endl;
                         Transaccion transaccion(*cuenta, TipoTransaccion("Calculo de interes de sobregiro-corriente"), 0, cuenta->getFechaCreacion());
                         listaTransacciones.insertarTransaccion(transaccion);
+                        
                         system("pause");
-                        break;}
+                        break;
+                    }
                     case 6: {
                         system("cls");
                         // Solo permite pagar hasta el monto pendiente de sobregiro
@@ -336,6 +348,7 @@ void menuTransacciones(Cuenta* cuenta) {
                                     << cuenta->getFechaCreacion().getAnio() << endl;
                                 Transaccion transaccion(*cuenta, TipoTransaccion("Pago de sobregiro-corriente"), montoPagar, cuenta->getFechaCreacion());
                                 listaTransacciones.insertarTransaccion(transaccion);
+                                
                                 break;
                             } else {
                                 cout << "Monto invalido. Intente de nuevo: $";
@@ -385,6 +398,7 @@ void menuTransacciones(Cuenta* cuenta) {
                                     if (eliminada) {
                                         cout << "Cuenta eliminada exitosamente." << endl;
                                         cuentaEliminada = true;
+                                        listaCuentas.guardarCuentasEnArchivo("cuentas.txt");
                                     } else {
                                         cout << "No se pudo eliminar la cuenta." << endl;
                                     }
@@ -441,9 +455,12 @@ Cuenta* submenuTipoCuentaUsuario(Cuenta* cuentasUsuario[2], int cuentaCount) {
 }
 
 
-
-
 int main() {
+    // Cargar cuentas desde el archivo si existe
+    listaCuentas.cargarCuentasDesdeArchivo("cuentas.txt");
+    
+    
+
     int opcion = 0;
     bool salir = false;
     while (!salir) {
@@ -455,9 +472,9 @@ int main() {
             if (opcion > 0)
                 opcion--;
             else
-                opcion = 8; // Si está en la primera opción, va a la última
+                opcion = 9; // Si está en la primera opción, va a la última
         } else if (tecla == 80) { // Flecha abajo
-            if (opcion < 8)
+            if (opcion < 9)
                 opcion++;
             else
                 opcion = 0; // Si está en la última opción, va a la primera
@@ -470,13 +487,13 @@ int main() {
                         break;
                     system("cls");
                     string nombre, apellido, cedula;
-                
+
                     // Pedir cédula con validación (ya valida dentro del método)
                     cedula = Validar::pedirCedula();
-                
+
                     // Determinar tipo de cuenta
                     TipoCuenta tipoCuenta(tipo == 0 ? "ahorros" : "corriente");
-                
+
                     // Verificar si ya existe una cuenta de ese tipo para esa cedula
                     Cuenta* cuentaMismaTipo = listaCuentas.buscarCuentaPorCedulaYTipo(cedula, tipoCuenta.getTipo());
                     if (cuentaMismaTipo) {
@@ -484,10 +501,10 @@ int main() {
                         system("pause");
                         break;
                     }
-                
+
                     // Buscar si ya existe alguna cuenta con esa cédula (para usar datos)
                     Cuenta* cuentaExistente = listaCuentas.buscarCuentaPorCedula(cedula);
-                
+
                     string contrasena;
                     if (cuentaExistente) {
                         nombre = cuentaExistente->getNombre();
@@ -499,16 +516,17 @@ int main() {
                         apellido = Validar::pedirApellido();
                         contrasena = ContrasenaUsuario::generarContrasenaBancaria();
                     }
-                
+
                     Persona persona(cedula, nombre, apellido);
                     double saldoInicial = 0.0;
                     Cuenta cuenta(persona, saldoInicial, tipoCuenta);
                     cuenta.setContrasena(contrasena);
                     listaCuentas.insertarCuenta(cuenta);
-                
+                    listaCuentas.guardarCuentasEnArchivo("cuentas.txt"); // Guardar solo después de insertar
+
                     cout << "Cuenta creada exitosamente con ID: " << cuenta.getIdCuentaStr() << endl;
                     cout << "Su contrasena bancaria es: " << contrasena << endl;
-                
+
                     system("pause");
                     break;
                 }
@@ -566,10 +584,20 @@ int main() {
                     system("pause");
                     break;
                 case 7:
+                    system("cls");
+                    CuentaBinario::txtACuentasBinario("cuentas.txt", "cuentas.dat");
+                    system("pause");
+                    break;
+                case 8: // Generar archivo binario
+                    system("cls");
+                    CuentaBinario::txtACuentasBinario("cuentas.txt", "cuentas.dat");
+                    system("pause");
+                    break;
+                case 9:
                     // Llama directamente a la ventana de ayuda con subsecciones
                     VentanaAyuda::Crear(GetModuleHandle(NULL));
                     break;
-                case 8:
+                case 10:
                     salir = true;
                     break;
             }
@@ -579,3 +607,5 @@ int main() {
     cout << "Gracias por usar el Sistema Bancario." << endl;
     return 0;
 }
+
+

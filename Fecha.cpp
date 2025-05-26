@@ -2,6 +2,11 @@
 #include <ctime>
 
 Fecha::Fecha() : dia(0), mes(0), anio(0) {}
+Fecha::Fecha(int dia, int mes, int anio) {
+    this->dia = dia;
+    this->mes = mes;
+    this->anio = anio;
+}
 
 int Fecha::getDia() { return dia; }
 void Fecha::setDia(int newDia) { dia = newDia; }

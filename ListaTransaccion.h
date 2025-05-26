@@ -1,7 +1,16 @@
 #ifndef __LISTATRANSACCION_H
 #define __LISTATRANSACCION_H
 #include "NodoTransaccion.h"
+#include "Cuenta.h"
+#include "TipoTransaccion.h"
+#include "Fecha.h"
+#include "Persona.h"
+#include "TipoCuenta.h"
+#include <iostream>
+#include <string>
 #include <vector>
+#include <fstream>
+#include <sstream>
 
 template<typename T>
 class ListaTransaccion
@@ -129,7 +138,7 @@ public:
       return resultados;
    }
 
-   // Puedes agregar más funciones auxiliares para otros criterios si lo necesitas
+    
 };
 
 #endif

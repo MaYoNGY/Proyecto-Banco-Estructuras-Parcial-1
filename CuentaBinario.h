@@ -1,43 +1,48 @@
 #pragma once
 #include <fstream>
 #include <iostream>
-#include "ListaCuenta.h"
+#include <string>
+#include <sstream>
 #include "Cuenta.h"
-#include "NodoCuenta.h"
+#include "Persona.h"
+#include "TipoCuenta.h"
+#include "Fecha.h"
 
 class CuentaBinario {
 public:
-    static void generarArchivoBinario(const ListaCuenta<Cuenta>& lista) {
-        // Verificar si el archivo existe. Si no existe, lo creamos vacío.
-        std::ifstream archivoExistente("cuentas.bin", std::ios::binary);
-        if (!archivoExistente) {
-            std::ofstream crearArchivo("cuentas.bin", std::ios::binary);
-            if (!crearArchivo) {
-                std::cout << "No se pudo crear el archivo binario." << std::endl;
-                return;
-            }
-            crearArchivo.close();
-        } else {
-            archivoExistente.close();
-        }
-
-        // Ahora escribimos en el archivo
-        std::ofstream archivo("cuentas.bin", std::ios::binary | std::ios::out | std::ios::app);
-        if (!archivo) {
-            std::cout << "No se pudo abrir el archivo binario." << std::endl;
+    
+    static void txtACuentasBinario(const std::string& archivoTxt, const std::string& archivoBinario) {
+        std::ifstream inFile(archivoTxt);
+        if (!inFile.is_open()) {
+            std::cerr << "Error al abrir el archivo de texto: " << archivoTxt << std::endl;
             return;
         }
 
-        auto actual = lista.getNodoCabeza();
-        if (actual) {
-            NodoCuenta<Cuenta>* inicio = actual;
-            do {
-                const Cuenta& cuenta = actual->getDato();
-                archivo.write(reinterpret_cast<const char*>(&cuenta), sizeof(Cuenta));
-                actual = actual->getSiguiente();
-            } while (actual && actual != inicio);
+        std::ofstream outFile(archivoBinario, std::ios::binary);
+        if (!outFile.is_open()) {
+            std::cerr << "Error al abrir el archivo binario: " << archivoBinario << std::endl;
+            return;
         }
 
-        archivo.close();
+        std::string linea;
+        while (std::getline(inFile, linea)) {
+            if (linea.empty()) continue;
+
+            std::istringstream iss(linea);
+            std::string idCuenta, cedula, nombre, apellido, tipo, contrasena;
+            
+            double saldo;
+            int dia, mes, anio;
+
+            Fecha fechaCreacion(dia, mes, anio);
+            TipoCuenta tipoCuenta(tipo);
+            Persona persona(cedula, nombre, apellido);
+            Cuenta cuenta(idCuenta, persona, saldo, tipoCuenta, contrasena, fechaCreacion);
+
+            outFile.write(reinterpret_cast<const char*>(&cuenta), sizeof(Cuenta));
+        }
+
+        inFile.close();
+        outFile.close();
     }
 };
