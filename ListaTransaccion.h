@@ -158,7 +158,82 @@ public:
        }
    }
 
-    
+   // Guarda todas las transacciones en un archivo de texto (modo append para no sobrescribir)
+   void guardarTransaccionesEnArchivo(const std::string& nombreArchivo) const {
+      std::ofstream archivo(nombreArchivo, std::ios::app); // Modo append
+      if (!archivo.is_open()) {
+         std::cout << "No se pudo abrir el archivo para guardar transacciones." << std::endl;
+         return;
+      }
+      if (!cabeza) {
+         archivo << "No hay transacciones en la lista." << std::endl;
+         archivo.close();
+         return;
+      }
+      NodoTransaccion<T>* actual = cabeza;
+      do {
+         T trans = actual->getDato();
+         auto cuenta = trans.getCuenta();
+         auto tipoCuenta = cuenta.getTipo();
+         auto tipoTrans = trans.getTipoTransaccion();
+         auto fecha = trans.getFecha();
+         archivo << "Cuenta ID: " << cuenta.getIdCuenta()
+                 << ", Nombre: " << cuenta.getNombre()
+                 << ", Cedula: " << cuenta.getCedula()
+                 << ", Tipo de Cuenta: " << tipoCuenta.getTipo()
+                 << ", Saldo: " << cuenta.getSaldo()
+                 << ", Tipo de Transaccion: " << tipoTrans.getTipo()
+                 << ", Monto: " << trans.getMonto()
+                 << ", Fecha: " << fecha.getDia() << "/"
+                 << fecha.getMes() << "/"
+                 << fecha.getAnio()
+                 << std::endl;
+         actual = actual->getSiguiente();
+      } while (actual != cabeza);
+      archivo.close();
+   }
+
+   // Guarda solo las transacciones de una fecha específica en un archivo de texto (modo append)
+   void guardarTransaccionesPorFechaEnArchivo(const std::string& nombreArchivo, int dia, int mes, int anio) const {
+      std::ofstream archivo(nombreArchivo, std::ios::app); // Modo append
+      if (!archivo.is_open()) {
+         std::cout << "No se pudo abrir el archivo para guardar transacciones por fecha." << std::endl;
+         return;
+      }
+      if (!cabeza) {
+         archivo << "No hay transacciones en la lista." << std::endl;
+         archivo.close();
+         return;
+      }
+      bool encontrado = false;
+      NodoTransaccion<T>* actual = cabeza;
+      do {
+         T trans = actual->getDato();
+         auto cuenta = trans.getCuenta();
+         auto tipoCuenta = cuenta.getTipo();
+         auto tipoTrans = trans.getTipoTransaccion();
+         auto fecha = trans.getFecha();
+         if (fecha.getDia() == dia && fecha.getMes() == mes && fecha.getAnio() == anio) {
+            archivo << "Cuenta ID: " << cuenta.getIdCuenta()
+                    << ", Nombre: " << cuenta.getNombre()
+                    << ", Cedula: " << cuenta.getCedula()
+                    << ", Tipo de Cuenta: " << tipoCuenta.getTipo()
+                    << ", Saldo: " << cuenta.getSaldo()
+                    << ", Tipo de Transaccion: " << tipoTrans.getTipo()
+                    << ", Monto: " << trans.getMonto()
+                    << ", Fecha: " << fecha.getDia() << "/"
+                    << fecha.getMes() << "/"
+                    << fecha.getAnio()
+                    << std::endl;
+            encontrado = true;
+         }
+         actual = actual->getSiguiente();
+      } while (actual != cabeza);
+      if (!encontrado) {
+         archivo << "No se encontraron transacciones para esa fecha." << std::endl;
+      }
+      archivo.close();
+   }
 };
 
 #endif

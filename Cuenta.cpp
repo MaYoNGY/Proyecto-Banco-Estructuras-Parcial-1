@@ -4,36 +4,27 @@
 #include <set>
 #include <cctype>
 #include <string>
+#include <iomanip>
+#include <random>
+
 
 
 // Variable estática para almacenar los IDs generados
 static std::set<std::string> idsGenerados;
 
+// Genera un ID de cuenta aleatorio de 10 dígitos
 void Cuenta::generarIdCuenta() {
-    std::string nombre = persona.getNombre();
-    std::string apellido = persona.getApellido();
-
-    std::string idBase = "";
-    if (!nombre.empty())
-        idBase += toupper(nombre[0]);
-    idBase += apellido;
-
-    std::string idGenerado = idBase;
-    int contador = 1;
-
-    while (idsGenerados.find(idGenerado) != idsGenerados.end()) {
-        idGenerado = idBase + std::to_string(contador);
-        contador++;
-    }
-
-    idsGenerados.insert(idGenerado);
-    idCuenta = idGenerado;
+    static std::mt19937 rng(std::random_device{}());
+    static std::uniform_int_distribution<unsigned long long> dist(1000000000ULL, 9999999999ULL);
+    std::ostringstream oss;
+    oss << dist(rng);
+    idCuenta = oss.str();
 }
 
-std::string Cuenta::getIdCuentaStr(void) {
+// Devuelve el ID de cuenta como string
+std::string Cuenta::getIdCuentaStr() const {
     return idCuenta;
-}
-
+}     
 std::string Cuenta::getNombre(void) const { 
    return persona.getNombre(); 
 }

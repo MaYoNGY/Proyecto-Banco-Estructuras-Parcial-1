@@ -233,7 +233,7 @@ std::string Validar::pedirIdCuenta() {
                 }
             }
             // Permitir letras y números
-            else if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+            else if (c >= '0' && c <= '9') {
                 id += c;
                 std::cout << c;
             }

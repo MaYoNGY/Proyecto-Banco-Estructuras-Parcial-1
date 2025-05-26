@@ -287,7 +287,7 @@ void buscarCuentasPorNombre(const std::string& nombreCompleto) const {
                     << ", Cedula: " << actual->getDato().getCedula()
                     << ", Nombre: " << actual->getDato().getNombre()
                     << ", Apellido: " << actual->getDato().getApellido()
-                    << ", Saldo: " << actual->getDato().getSaldo()
+                    //<< ", Saldo: " << actual->getDato().getSaldo()
                     << ", Tipo: " << actual->getDato().getTipo().getTipo()
                     << std::endl;
             encontrada = true;
@@ -326,7 +326,7 @@ void buscarCuentasPorCedula(const std::string& cedula) const {
                       << ", Cedula: " << actual->getDato().getCedula()
                       << ", Nombre: " << actual->getDato().getNombre()
                       << ", Apellido: " << actual->getDato().getApellido()
-                      << ", Saldo: " << actual->getDato().getSaldo()
+                      //<< ", Saldo: " << actual->getDato().getSaldo()
                       << ", Tipo: " << actual->getDato().getTipo().getTipo()
                       << std::endl;
             encontradas = true;
@@ -353,7 +353,7 @@ void mostrarCuentaPorId(const std::string& id) const {
                     << ", Cedula: " << cuenta.getCedula()
                     << ", Nombre: " << cuenta.getNombre()
                     << ", Apellido: " << cuenta.getApellido()
-                    << ", Saldo: " << cuenta.getSaldo()
+                    //<< ", Saldo: " << cuenta.getSaldo()
                     << ", Tipo: " << cuenta.getTipo().getTipo()
                     << std::endl;
             encontrada = true;

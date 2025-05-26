@@ -19,7 +19,7 @@ private:
 
 
 public:
-   std::string getIdCuentaStr(void);
+   std::string getIdCuentaStr(void) const;
    void generarIdCuenta();
 
    std::string getNombre(void) const;
