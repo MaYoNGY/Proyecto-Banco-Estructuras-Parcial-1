@@ -5,19 +5,14 @@
 #include <cctype>
 #include <string>
 #include <iomanip>
-#include <random>
 
+// Variable estática para el contador de IDs
+static unsigned long long contadorId = 1;
 
-
-// Variable estática para almacenar los IDs generados
-static std::set<std::string> idsGenerados;
-
-// Genera un ID de cuenta aleatorio de 10 dígitos
+// Genera un ID de cuenta incremental con ceros a la izquierda
 void Cuenta::generarIdCuenta() {
-    static std::mt19937 rng(std::random_device{}());
-    static std::uniform_int_distribution<unsigned long long> dist(1000000000ULL, 9999999999ULL);
     std::ostringstream oss;
-    oss << dist(rng);
+    oss << std::setw(9) << std::setfill('0') << contadorId++;
     idCuenta = oss.str();
 }
 

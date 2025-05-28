@@ -1,6 +1,6 @@
 /***********************************************************************
  * Module:  main.cpp
- * Author:  Marjorie Cedeño,Victoria Diaz, Domenika Naranjo
+ * Author:  Marjorie Cedeño, Victoria Diaz, Domenika Naranjo
  * Modified: sabado, 17 de mayo de 2025 21:08:05
  * Purpose: Cuenta Bancaria
  ***********************************************************************/
