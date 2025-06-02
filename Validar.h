@@ -20,8 +20,13 @@ public:
    static Fecha pedirFecha();
    static std::pair<Fecha, Fecha> pedirRangoFecha();
    static bool validarCedulaEcuatoriana(const std::string& cedula);
-
-
+   static std::string pedirNombreArchivoBackup();
+   static std::string pedirNombreArchivoCifrado();
+   static int pedirClaveNumerica();
+   static std::string pedirNombreArchivoBackupCi();
+   static std::string pedirNombreArchivoDecifrado();
+   static int pedirClaveNumericaCi();
+   static std::string pedirDato();
 
 };
 

@@ -192,32 +192,35 @@ public:
    }
 
    // Método para guardar todas las cuentas en un archivo txt
-   void guardarCuentasEnArchivo(const std::string& nombreArchivo) {
-      std::ofstream archivo(nombreArchivo, std::ios::out);
-      if (!archivo) {
-         std::cerr << "Error al abrir el archivo " << nombreArchivo << " para escritura.\n";
-         return;
-      }
-      NodoCuenta<T>* actual = cabeza;
-      if (!actual) {
-         archivo.close();
-         return;
-      }
-      do {
-         archivo << actual->getDato().getIdCuenta() << " "
-                 << actual->getDato().getCedula() << " "
-                 << actual->getDato().getNombre() << " "
-                 << actual->getDato().getApellido() << " "
-                 << actual->getDato().getTipo().getTipo() << " "
-                 << actual->getDato().getContrasena() << " "
-                 << actual->getDato().getFechaCreacion().getDia() << " "
-                 << actual->getDato().getFechaCreacion().getMes() << " "
-                 << actual->getDato().getFechaCreacion().getAnio()
-                 << std::endl;
-         actual = actual->getSiguiente();
-      } while (actual != cabeza);
-      archivo.close();
-   }
+// ...existing code...
+void guardarCuentasEnArchivo(const std::string& nombreArchivo) {
+    std::ofstream archivo(nombreArchivo, std::ios::out);
+    if (!archivo) {
+        std::cerr << "Error al abrir el archivo " << nombreArchivo << " para escritura.\n";
+        return;
+    }
+    NodoCuenta<T>* actual = cabeza;
+    if (!actual) {
+        archivo.close();
+        return;
+    }
+    do {
+        archivo << actual->getDato().getIdCuenta() << " "
+                << actual->getDato().getCedula() << " "
+                << actual->getDato().getNombre() << " "
+                << actual->getDato().getApellido() << " "
+                << actual->getDato().getTipo().getTipo() << " "
+                << actual->getDato().getContrasena() << " "
+                << actual->getDato().getSaldo() << " " // <-- saldo actual
+                << actual->getDato().getFechaCreacion().getDia() << " "
+                << actual->getDato().getFechaCreacion().getMes() << " "
+                << actual->getDato().getFechaCreacion().getAnio()
+                << std::endl;
+        actual = actual->getSiguiente();
+    } while (actual != cabeza);
+    archivo.close();
+}
+// ...existing code...
 
    // Limpia la lista antes de cargar para evitar duplicados
    void limpiarLista() {
@@ -243,32 +246,34 @@ public:
       limpiarLista(); // Limpia la lista antes de cargar
 
       std::string linea;
-      while (std::getline(archivo, linea)) {
-         if (linea.empty()) continue;
-         std::istringstream iss(linea);
-         std::string idCuenta, cedula, nombre, apellido, tipo, contrasena;
-         double saldo;
-         int dia, mes, anio;
-
-         // Lee los campos en el mismo orden en que se guardaron
-         if (!(iss >> idCuenta >> cedula >> nombre >> apellido >>  tipo >> contrasena >> dia >> mes >> anio)) {
+    // ...existing code...
+    while (std::getline(archivo, linea)) {
+        if (linea.empty()) continue;
+        std::istringstream iss(linea);
+        std::string idCuenta, cedula, nombre, apellido, tipo, contrasena;
+        double saldo;
+        int dia, mes, anio;
+    
+        // Lee los campos en el mismo orden en que se guardaron
+        if (!(iss >> idCuenta >> cedula >> nombre >> apellido >> tipo >> contrasena >> saldo >> dia >> mes >> anio)) {
             std::cerr << "Error de formato en la línea: " << linea << std::endl;
             continue;
-         }
-
-         // Validación básica de datos
-         if (idCuenta.empty() || cedula.empty() || nombre.empty() || apellido.empty() || tipo.empty() || contrasena.empty())
+        }
+    
+        // Validación básica de datos
+        if (idCuenta.empty() || cedula.empty() || nombre.empty() || apellido.empty() || tipo.empty() || contrasena.empty())
             continue;
-
-         Fecha fechaCreacion;
-         fechaCreacion.setDia(dia);
-         fechaCreacion.setMes(mes);
-         fechaCreacion.setAnio(anio);
-
-         TipoCuenta tipoCuenta(tipo);
-         Persona persona(cedula, nombre, apellido);
-         Cuenta cuenta(idCuenta, persona, saldo, tipoCuenta, contrasena, fechaCreacion);
-         insertarCuenta(cuenta);
+    
+        Fecha fechaCreacion;
+        fechaCreacion.setDia(dia);
+        fechaCreacion.setMes(mes);
+        fechaCreacion.setAnio(anio);
+    
+        TipoCuenta tipoCuenta(tipo);
+        Persona persona(cedula, nombre, apellido);
+        Cuenta cuenta(idCuenta, persona, saldo, tipoCuenta, contrasena, fechaCreacion);
+        insertarCuenta(cuenta);
+    // ...existing code...
       }
       archivo.close();
    }
@@ -287,7 +292,7 @@ void buscarCuentasPorNombre(const std::string& nombreCompleto) const {
                     << ", Cedula: " << actual->getDato().getCedula()
                     << ", Nombre: " << actual->getDato().getNombre()
                     << ", Apellido: " << actual->getDato().getApellido()
-                    //<< ", Saldo: " << actual->getDato().getSaldo()
+                    << ", Saldo: " << actual->getDato().getSaldo()
                     << ", Tipo: " << actual->getDato().getTipo().getTipo()
                     << std::endl;
             encontrada = true;
@@ -326,7 +331,7 @@ void buscarCuentasPorCedula(const std::string& cedula) const {
                       << ", Cedula: " << actual->getDato().getCedula()
                       << ", Nombre: " << actual->getDato().getNombre()
                       << ", Apellido: " << actual->getDato().getApellido()
-                      //<< ", Saldo: " << actual->getDato().getSaldo()
+                      << ", Saldo: " << actual->getDato().getSaldo()
                       << ", Tipo: " << actual->getDato().getTipo().getTipo()
                       << std::endl;
             encontradas = true;
@@ -353,7 +358,7 @@ void mostrarCuentaPorId(const std::string& id) const {
                     << ", Cedula: " << cuenta.getCedula()
                     << ", Nombre: " << cuenta.getNombre()
                     << ", Apellido: " << cuenta.getApellido()
-                    //<< ", Saldo: " << cuenta.getSaldo()
+                    << ", Saldo: " << cuenta.getSaldo()
                     << ", Tipo: " << cuenta.getTipo().getTipo()
                     << std::endl;
             encontrada = true;
@@ -363,6 +368,36 @@ void mostrarCuentaPorId(const std::string& id) const {
     } while (actual != cabeza);
     if (!encontrada) {
         std::cout << "No se encontro ninguna cuenta con ese ID." << std::endl;
+    }
+}
+
+void buscarCuentasPorDato(const std::string& valor) const {
+    if (!cabeza) {
+        std::cout << "No hay cuentas en la lista." << std::endl;
+        return;
+    }
+    NodoCuenta<T>* actual = cabeza;
+    bool encontrada = false;
+    do {
+        const T& cuenta = actual->getDato();
+        if (cuenta.getNombre() == valor ||
+            cuenta.getApellido() == valor ||
+            cuenta.getCedula() == valor ||
+            cuenta.getIdCuenta() == valor ||
+            cuenta.getTipo().getTipo() == valor) {
+            std::cout << "ID: " << cuenta.getIdCuenta()
+                      << ", Cedula: " << cuenta.getCedula()
+                      << ", Nombre: " << cuenta.getNombre()
+                      << ", Apellido: " << cuenta.getApellido()
+                      << ", Saldo: " << cuenta.getSaldo()
+                      << ", Tipo: " << cuenta.getTipo().getTipo()
+                      << std::endl;
+            encontrada = true;
+        }
+        actual = actual->getSiguiente();
+    } while (actual != cabeza);
+    if (!encontrada) {
+        std::cout << "No se encontraron cuentas con el dato: " << valor << std::endl;
     }
 }
 

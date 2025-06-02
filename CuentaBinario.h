@@ -27,18 +27,20 @@ public:
         std::string linea;
         while (std::getline(inFile, linea)) {
             if (linea.empty()) continue;
-
+        
             std::istringstream iss(linea);
             std::string idCuenta, cedula, nombre, apellido, tipo, contrasena;
-            
             double saldo;
             int dia, mes, anio;
-
+        
+            // Lee los datos en el mismo orden en que se guardaron
+            iss >> idCuenta >> cedula >> nombre >> apellido >> tipo >> contrasena >> saldo >> dia >> mes >> anio;
+        
             Fecha fechaCreacion(dia, mes, anio);
             TipoCuenta tipoCuenta(tipo);
             Persona persona(cedula, nombre, apellido);
             Cuenta cuenta(idCuenta, persona, saldo, tipoCuenta, contrasena, fechaCreacion);
-
+        
             outFile.write(reinterpret_cast<const char*>(&cuenta), sizeof(Cuenta));
         }
 

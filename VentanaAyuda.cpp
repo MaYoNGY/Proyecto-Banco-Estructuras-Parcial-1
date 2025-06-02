@@ -7,13 +7,13 @@ static HWND hwndAyuda = NULL;
 static HWND hwndModuloBtns[7];
 static HWND hwndTextoAyuda = NULL;
 static const wchar_t* textosAyuda[] = {
-L"Crear nueva cuenta:\nAquí puedes crear tu propia cuenta bancaria en el sistema. Puedes elegir entre una cuenta de ahorros o una cuenta corriente, cada una con sus propias reglas:\n- La cuenta de ahorros no permite sobregiros y tiene un límite de retiros mensuales.\n- La cuenta corriente sí permite sobregiros hasta cierto monto.\nAl crear tu cuenta, se te pedirá ingresar tus datos personales como nombres, apellidos, fecha de nacimiento, número de cédula (válida), y una clave segura para proteger tu acceso. Todos los datos se almacenan de forma segura y se guardan automáticamente.",
-L"Iniciar sesión para trámites:\nAntes de hacer cualquier operación en el sistema, como ver tu saldo o retirar dinero, necesitas iniciar sesión. Solo debes ingresar tu número de cuenta o tu cédula, junto con la clave que creaste al registrarte. Esto garantiza que solo tú puedas acceder a tus datos y realizar movimientos en tu cuenta.",
-L"Consultas avanzadas:\n¿Quieres ver tus movimientos bancarios con más detalle? Con esta opción puedes buscar y filtrar tus transacciones por nombre, apellido, fecha, tipo de cuenta, y más. Es ideal si necesitas revisar tus depósitos, retiros o simplemente tener control total de tus operaciones. Puedes combinar varios filtros a la vez para encontrar exactamente lo que buscas.",
-L"Generar Backup:\nCon esta función puedes crear una copia de seguridad de todos tus datos bancarios. El sistema guarda automáticamente una copia del archivo con la fecha y hora exacta, así nunca se pierde información importante. Puedes usar esta opción cada vez que lo necesites, sin preocuparte por sobrescribir las versiones anteriores.",
-L"Restaurar Backup:\nSi en algún momento ocurre un error o necesitas volver a un estado anterior de tus datos, esta opción te permite restaurar una copia de seguridad previamente guardada. Todo quedará tal y como estaba en el momento del respaldo: cuentas, saldos, movimientos y configuración.",
-L"Ayuda:\n¿Primera vez usando el sistema? No te preocupes. Aquí encontrarás una guía paso a paso que te explica cómo usar cada parte del programa: desde crear tu cuenta, iniciar sesión, hacer depósitos y retiros, hasta proteger tus datos y hacer respaldos. Todo explicado de forma sencilla para que no te pierdas.",
-L"Salir:\nCuando termines de usar el sistema, utiliza esta opción para salir de manera segura. Así te aseguras de que todos tus datos queden bien guardados y no se pierda nada. El sistema se cierra correctamente y libera toda la información de forma ordenada."
+L"Crear nueva cuenta:\n\nAquí puedes crear tu propia cuenta bancaria en el sistema.\nPuedes elegir entre una cuenta de ahorros o una cuenta corriente, cada una con sus propias reglas:\n- La cuenta de ahorros no permite sobregiros y tiene un límite de retiros mensuales.\n- La cuenta corriente sí permite sobregiros hasta cierto monto.\nAl crear tu cuenta, se te pedirá ingresar tus datos personales como nombres, apellidos, fecha de nacimiento, número de cédula (válida), y una clave segura para proteger tu acceso. Todos los datos se almacenan de forma segura y se guardan automáticamente.",
+L"Iniciar sesión para trámites:\n\nAntes de hacer cualquier operación en el sistema, como ver tu saldo o retirar dinero,\nnecesitas iniciar sesión. Solo debes ingresar tu número de cuenta o tu cédula, junto con la clave que creaste al registrarte. Esto garantiza que solo tú puedas acceder a tus datos y realizar movimientos en tu cuenta.",
+L"Consultas avanzadas:\n\n¿Quieres ver tus movimientos bancarios con más detalle? \nCon esta opción puedes buscar y filtrar tus transacciones por nombre, apellido, fecha, tipo de cuenta, y más. \nEs ideal si necesitas revisar tus depósitos, retiros o simplemente tener control total de tus operaciones. Puedes combinar varios filtros a la vez para encontrar exactamente lo que buscas.",
+L"Generar Backup:\n\nCon esta función puedes crear una copia de seguridad de todos tus datos bancarios. \nEl sistema guarda automáticamente una copia del archivo con la fecha y hora exacta, así nunca se pierde información importante. \nPuedes usar esta opción cada vez que lo necesites, sin preocuparte por sobrescribir las versiones anteriores.",
+L"Restaurar Backup:\n\nSi en algún momento ocurre un error o necesitas volver a un estado anterior de tus datos,\n esta opción te permite restaurar una copia de seguridad previamente guardada. Todo quedará tal y como estaba en el momento del respaldo: cuentas, saldos, movimientos y configuración.",
+L"Ayuda:\n\n¿Primera vez usando el sistema? No te preocupes. Aquí encontrarás una guía paso a paso que te explica cómo usar cada parte del programa: \ndesde crear tu cuenta, iniciar sesión, hacer depósitos y retiros, hasta proteger tus datos y hacer respaldos. \nTodo explicado de forma sencilla para que no te pierdas.",
+L"Salir:\n\nCuando termines de usar el sistema,\n utiliza esta opción para salir de manera segura. Así te aseguras de que todos tus datos queden bien guardados y no se pierda nada.\n El sistema se cierra correctamente y libera toda la información de forma ordenada."
 
 
 };
@@ -32,12 +32,12 @@ void VentanaAyuda::Crear(HINSTANCE hInstance) {
     hwndAyuda = CreateWindowExW(
         0, CLASS_NAME, L"Ayuda del Sistema Bancario",
         WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, 700, 400,
+        CW_USEDEFAULT, CW_USEDEFAULT, 800, 500,
         NULL, NULL, hInstance, NULL
     );
 
     int btnHeight = 35;
-    int btnWidth = 180;
+    int btnWidth = 190;
     const wchar_t* modulos[] = {
         L"Crear nueva cuenta",
         L"Iniciar sesion para tramites",

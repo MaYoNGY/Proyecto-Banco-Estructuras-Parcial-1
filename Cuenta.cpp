@@ -7,7 +7,8 @@
 #include <iomanip>
 
 // Variable estática para el contador de IDs
-static unsigned long long contadorId = 1;
+
+extern unsigned long long contadorId;
 
 // Genera un ID de cuenta incremental con ceros a la izquierda
 void Cuenta::generarIdCuenta() {

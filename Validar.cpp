@@ -55,7 +55,7 @@ std::string Validar::pedirNombre() {
                     cout << "\b \b";
                 }
             }
-            else if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == ' ') {
+            else if ((c >= 'a' && c <= 'z')) {
                 nombre += c;
                 cout << c;
             }
@@ -85,7 +85,7 @@ std::string Validar::pedirApellido() {
                     cout << "\b \b";
                 }
             }
-            else if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == ' ') {
+            else if ((c >= 'a' && c <= 'z')) {
                 apellido += c;
                 cout << c;
             }
@@ -250,57 +250,73 @@ Fecha Validar::pedirFecha() {
     int dia, mes, anio;
     while (true) {
         // Día
-        std::cout << "Ingrese dia: ";
-        diaStr = "";
-        char c;
-        while (true) {
-            c = _getch();
-            if (c == 13) { std::cout << std::endl; break; }
-            else if (c == 8) {
-                if (!diaStr.empty()) { diaStr.pop_back(); std::cout << "\b \b"; }
+        do {
+            std::cout << "Ingrese dia: ";
+            diaStr = "";
+            char c;
+            while (true) {
+                c = _getch();
+                if (c == 13) { std::cout << std::endl; break; }
+                else if (c == 8) {
+                    if (!diaStr.empty()) { diaStr.pop_back(); std::cout << "\b \b"; }
+                }
+                else if (c >= '0' && c <= '9' && diaStr.length() < 2) {
+                    diaStr += c; std::cout << c;
+                }
             }
-            else if (c >= '0' && c <= '9' && diaStr.length() < 2) {
-                diaStr += c; std::cout << c;
+            if (diaStr.empty()) {
+                std::cout << "El dia no puede estar vacio. Intente de nuevo." << std::endl;
             }
-        }
+        } while (diaStr.empty());
+
         // Mes
-        std::cout << "Ingrese mes: ";
-        mesStr = "";
-        while (true) {
-            c = _getch();
-            if (c == 13) { std::cout << std::endl; break; }
-            else if (c == 8) {
-                if (!mesStr.empty()) { mesStr.pop_back(); std::cout << "\b \b"; }
+        do {
+            std::cout << "Ingrese mes: ";
+            mesStr = "";
+            char c;
+            while (true) {
+                c = _getch();
+                if (c == 13) { std::cout << std::endl; break; }
+                else if (c == 8) {
+                    if (!mesStr.empty()) { mesStr.pop_back(); std::cout << "\b \b"; }
+                }
+                else if (c >= '0' && c <= '9' && mesStr.length() < 2) {
+                    mesStr += c; std::cout << c;
+                }
             }
-            else if (c >= '0' && c <= '9' && mesStr.length() < 2) {
-                mesStr += c; std::cout << c;
+            if (mesStr.empty()) {
+                std::cout << "El mes no puede estar vacio. Intente de nuevo." << std::endl;
             }
-        }
+        } while (mesStr.empty());
+
         // Año
-        std::cout << "Ingrese anio: ";
-        anioStr = "";
-        while (true) {
-            c = _getch();
-            if (c == 13) { std::cout << std::endl; break; }
-            else if (c == 8) {
-                if (!anioStr.empty()) { anioStr.pop_back(); std::cout << "\b \b"; }
+        do {
+            std::cout << "Ingrese anio: ";
+            anioStr = "";
+            char c;
+            while (true) {
+                c = _getch();
+                if (c == 13) { std::cout << std::endl; break; }
+                else if (c == 8) {
+                    if (!anioStr.empty()) { anioStr.pop_back(); std::cout << "\b \b"; }
+                }
+                else if (c >= '0' && c <= '9' && anioStr.length() < 4) {
+                    anioStr += c; std::cout << c;
+                }
             }
-            else if (c >= '0' && c <= '9' && anioStr.length() < 4) {
-                anioStr += c; std::cout << c;
+            if (anioStr.empty()) {
+                std::cout << "El anio no puede estar vacio. Intente de nuevo." << std::endl;
             }
-        }
+        } while (anioStr.empty());
+
         // Validación básica
-        if (!diaStr.empty() && !mesStr.empty() && !anioStr.empty()) {
-            dia = std::stoi(diaStr);
-            mes = std::stoi(mesStr);
-            anio = std::stoi(anioStr);
-            if (Fecha::validarFecha(dia, mes, anio)) {
-                break; // Fecha válida, salimos del ciclo
-            } else {
-                std::cout << "Fecha invalida. Intente de nuevo." << std::endl;
-            }
+        dia = std::stoi(diaStr);
+        mes = std::stoi(mesStr);
+        anio = std::stoi(anioStr);
+        if (Fecha::validarFecha(dia, mes, anio)) {
+            break; // Fecha válida, salimos del ciclo
         } else {
-            std::cout << "La fecha no puede estar vacia. Intente de nuevo." << std::endl;
+            std::cout << "Fecha invalida. Intente de nuevo." << std::endl;
         }
     }
     return Fecha(dia, mes, anio); // Solo retornas aquí, cuando la fecha es válida
@@ -328,5 +344,173 @@ std::pair<Fecha, Fecha> Validar::pedirRangoFecha() {
         }
     }
     return std::make_pair(fechaInicio, fechaFin);
+}
+
+    // Pide un nombre de archivo válido (letras, números, guion bajo, punto)
+std::string Validar::pedirNombreArchivoBackup() {
+    std::string nombre;
+    char c;
+    std::cout << "Ingrese el nombre del archivo de backup a cifrar: ";
+    while (true) {
+        c = _getch();
+        if (c == 13 && !nombre.empty()) { // Enter
+            std::cout << std::endl;
+            break;
+        } else if (c == 8) { // Backspace
+            if (!nombre.empty()) {
+                nombre.pop_back();
+                std::cout << "\b \b";
+            }
+        } else if (std::isalnum(c) || c == '_' || c == '.') {
+            nombre += c;
+            std::cout << c;
+        }
+        // Ignora otros caracteres
+    }
+    return nombre;
+}
+
+std::string Validar::pedirNombreArchivoCifrado() {
+    std::string nombre;
+    char c;
+    std::cout << "Ingrese el nombre del archivo cifrado de salida: ";
+    while (true) {
+        c = _getch();
+        if (c == 13 && !nombre.empty()) { // Enter
+            std::cout << std::endl;
+            break;
+        } else if (c == 8) { // Backspace
+            if (!nombre.empty()) {
+                nombre.pop_back();
+                std::cout << "\b \b";
+            }
+        } else if (std::isalnum(c) || c == '_' || c == '.') {
+            nombre += c;
+            std::cout << c;
+        }
+        // Ignora otros caracteres
+    }
+    return nombre;
+}
+
+// Pide una clave numérica válida
+int Validar::pedirClaveNumerica() {
+    std::string claveStr;
+    char c;
+    std::cout << "Ingrese la clave numerica para el cifrado Cesar: ";
+    while (true) {
+        c = _getch();
+        if (c == 13 && !claveStr.empty()) { // Enter
+            std::cout << std::endl;
+            break;
+        } else if (c == 8 && !claveStr.empty()) { // Backspace
+            claveStr.pop_back();
+            std::cout << "\b \b";
+        } else if (std::isdigit(c)) {
+            claveStr += c;
+            std::cout << c;
+        }
+        // Ignora otros caracteres
+    }
+    return std::stoi(claveStr);
+}
+
+    // Pide un nombre de archivo válido (letras, números, guion bajo, punto)
+std::string Validar::pedirNombreArchivoBackupCi() {
+    std::string nombre;
+    char c;
+    std::cout << "Ingrese el nombre del archivo cifrado a descifrar: ";
+    while (true) {
+        c = _getch();
+        if (c == 13 && !nombre.empty()) { // Enter
+            std::cout << std::endl;
+            break;
+        } else if (c == 8) { // Backspace
+            if (!nombre.empty()) {
+                nombre.pop_back();
+                std::cout << "\b \b";
+            }
+        } else if (std::isalnum(c) || c == '_' || c == '.') {
+            nombre += c;
+            std::cout << c;
+        }
+        // Ignora otros caracteres
+    }
+    return nombre;
+}
+
+std::string Validar::pedirNombreArchivoDecifrado() {
+    std::string nombre;
+    char c;
+    std::cout << "Ingrese el nombre del archivo de salida descifrado: ";
+    while (true) {
+        c = _getch();
+        if (c == 13 && !nombre.empty()) { // Enter
+            std::cout << std::endl;
+            break;
+        } else if (c == 8) { // Backspace
+            if (!nombre.empty()) {
+                nombre.pop_back();
+                std::cout << "\b \b";
+            }
+        } else if (std::isalnum(c) || c == '_' || c == '.') {
+            nombre += c;
+            std::cout << c;
+        }
+        // Ignora otros caracteres
+    }
+    return nombre;
+}
+
+// Pide una clave numérica válida
+int Validar::pedirClaveNumericaCi() {
+    std::string claveStr;
+    char c;
+    std::cout << "Ingrese la clave numerica usada para el cifrado Cesar: ";
+    while (true) {
+        c = _getch();
+        if (c == 13 && !claveStr.empty()) { // Enter
+            std::cout << std::endl;
+            break;
+        } else if (c == 8 && !claveStr.empty()) { // Backspace
+            claveStr.pop_back();
+            std::cout << "\b \b";
+        } else if (std::isdigit(c)) {
+            claveStr += c;
+            std::cout << c;
+        }
+        // Ignora otros caracteres
+    }
+    return std::stoi(claveStr);
+}
+
+std::string Validar::pedirDato() {
+    std::string dato;
+    do {
+        std::cout << "Ingrese cualquier dato (nombre, apellido, ID, cedula, tipo cuenta): ";
+        dato = "";
+        char c;
+        while (true) {
+            c = _getch();
+            if (c == 13) { // Enter
+                std::cout << std::endl;
+                break;
+            }
+            else if (c == 8) { // Backspace
+                if (!dato.empty()) {
+                    dato.pop_back();
+                    std::cout << "\b \b";
+                }
+            }
+            else if (std::isalnum(c) || (c >= 'a' && c <= 'z')) {
+                dato += c;
+                std::cout << c;
+            }
+        }
+        if (dato.empty()) {
+            std::cout << "El dato no puede estar vacío. Intente de nuevo." << std::endl;
+        }
+    } while (dato.empty());
+    return dato;
 }
 
