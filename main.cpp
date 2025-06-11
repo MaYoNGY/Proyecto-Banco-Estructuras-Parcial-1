@@ -29,6 +29,9 @@
 #include "TipoTransaccion.cpp"
 #include "CuentaBinario.h"
 #include "CifradoCesar.h"
+#include "AccesoUsuario.h" // Incluye la clase de acceso de usuario
+#include "TransaccionesUsuario.h"
+#include "SimuladorSobregiro.h"
 
 using namespace std;
 
@@ -82,10 +85,14 @@ void imprimirMenu(int opcionSeleccionada) {
         "6. Generar archivo binario",
         "7. Cifrar backup",
         "8. Decifrar backup",
-        "9. Ayuda",
-        "10. Salir"
+        "9. Ordenar cuentas",
+        "10. Ayuda",
+        "11. Pico de acceso de usuario", // Nueva opción
+        "12. Pico de transacciones de usuario",
+        "13. Calcular pago de sobregiro de una cuenta",
+        "14. Salir"
     };
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 14; i++) {
         if (i == opcionSeleccionada)
             cout << ">> " << opciones[i] << endl;
         else
@@ -199,6 +206,7 @@ void menuTransacciones(Cuenta* cuenta) {
                         listaTransacciones.guardarTransaccionesEnArchivo("transacciones1.txt");
                         listaTransacciones.guardarTransaccionesEnArchivoPr("transacciones.txt");
                         listaCuentas.guardarCuentasEnArchivo("cuentas.txt");
+
                         system("pause");
                     break;
                     }
@@ -206,7 +214,7 @@ void menuTransacciones(Cuenta* cuenta) {
                         system("cls");
                         if(double monto = pedirMontoSeguro("Ingrese monto a depositar: $")){
                             operacion += monto;
-                                                    cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
+                            cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
                             << cuenta->getFechaCreacion().getMes() << "/" 
                             << cuenta->getFechaCreacion().getAnio() << endl;
                             Transaccion transaccion(*cuenta, TipoTransaccion("Deposito-ahorro"), monto, cuenta->getFechaCreacion());
@@ -214,6 +222,7 @@ void menuTransacciones(Cuenta* cuenta) {
                             listaTransacciones.guardarTransaccionesEnArchivo("transacciones1.txt");
                             listaTransacciones.guardarTransaccionesEnArchivoPr("transacciones.txt");
                             listaCuentas.guardarCuentasEnArchivo("cuentas.txt");
+                            TransaccionesUsuario::registrarTransaccion(cuenta->getIdCuenta(), monto);
                         }
                         system("pause");
                         break;
@@ -230,7 +239,7 @@ void menuTransacciones(Cuenta* cuenta) {
                         listaTransacciones.insertarTransaccion(transaccion);
                         listaTransacciones.guardarTransaccionesEnArchivo("transacciones1.txt");
                         listaTransacciones.guardarTransaccionesEnArchivoPr("transacciones.txt");
-
+                        TransaccionesUsuario::registrarTransaccion(cuenta->getIdCuenta(), -monto);
                         listaCuentas.guardarCuentasEnArchivo("cuentas.txt");
                         }
                         system("pause");
@@ -322,6 +331,7 @@ void menuTransacciones(Cuenta* cuenta) {
                         listaTransacciones.guardarTransaccionesEnArchivoPr("transacciones.txt");
                         listaCuentas.guardarCuentasEnArchivo("cuentas.txt");
                         cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
+                        TransaccionesUsuario::registrarTransaccion(cuenta->getIdCuenta(), monto);
                         }
                         system("pause");
                         break;
@@ -339,6 +349,7 @@ void menuTransacciones(Cuenta* cuenta) {
                         listaTransacciones.guardarTransaccionesEnArchivo("transacciones1.txt");
                         listaTransacciones.guardarTransaccionesEnArchivoPr("transacciones.txt");
                         listaCuentas.guardarCuentasEnArchivo("cuentas.txt");
+                        TransaccionesUsuario::registrarTransaccion(cuenta->getIdCuenta(), -monto);
                         }
                         system("pause");
                         break;
@@ -397,6 +408,7 @@ void menuTransacciones(Cuenta* cuenta) {
                                 listaTransacciones.guardarTransaccionesEnArchivo("transacciones1.txt");
                                 listaTransacciones.guardarTransaccionesEnArchivoPr("transacciones.txt");
                                 listaCuentas.guardarCuentasEnArchivo("cuentas.txt");
+                                TransaccionesUsuario::registrarTransaccion(cuenta->getCedula(), -montoPagar);
                                 break;
                             } else {
                                 cout << "Monto invalido. Intente de nuevo: $";
@@ -694,6 +706,87 @@ void restaurarBackupTransacciones() {
     }
 }
 
+void menuOrdenarCuentas() {
+    int opcion = 0;
+    std::string opciones[] = {
+        "1. Ordenar por nombre A-Z",
+        "2. Ordenar por nombre Z-A",
+        "3. Ordenar por apellido A-Z",
+        "4. Ordenar por apellido Z-A",
+        "5. Ordenar por fecha mas antigua de creacion",
+        "6. Ordenar por fecha mas nueva de creacion",
+        "7. Regresar"
+    };
+    bool regresar = false;
+    while (!regresar) {
+        system("cls");
+        std::cout << "===== Ordenar cuentas =====" << std::endl;
+        for (int i = 0; i < 7; i++) {
+            if (i == opcion)
+                std::cout << ">> " << opciones[i] << std::endl;
+            else
+                std::cout << "   " << opciones[i] << std::endl;
+        }
+        int tecla = _getch();
+        if (tecla == 224) {
+            tecla = _getch();
+            if (tecla == 72) { // Flecha arriba
+                if (opcion > 0)
+                    opcion--;
+                else
+                    opcion = 6;
+            } else if (tecla == 80) { // Flecha abajo
+                if (opcion < 6)
+                    opcion++;
+                else
+                    opcion = 0;
+            }
+        } else if (tecla == 13) {
+            switch (opcion) {
+                case 0:
+                    listaCuentas.ordenarPorCampo(0);
+                    std::cout << "Cuentas ordenadas por nombre A-Z:" << std::endl;
+                    listaCuentas.mostrarCuentasConFecha();
+                    system("pause");
+                    break;
+                case 1:
+                    listaCuentas.ordenarPorCampo(4);
+                    std::cout << "Cuentas ordenadas por nombre Z-A:" << std::endl;
+                    listaCuentas.mostrarCuentasConFecha();
+                    system("pause");
+                    break;
+                case 2:
+                    listaCuentas.ordenarPorCampo(1);
+                    std::cout << "Cuentas ordenadas por apellido A-Z:" << std::endl;
+                    listaCuentas.mostrarCuentasConFecha();
+                    system("pause");
+                    break;
+                case 3:
+                    listaCuentas.ordenarPorCampo(5);
+                    std::cout << "Cuentas ordenadas por apellido Z-A:" << std::endl;
+                    listaCuentas.mostrarCuentasConFecha();
+                    system("pause");
+                    break;                   
+                case 4:
+                    listaCuentas.ordenarPorCampo(2);
+                    std::cout << "Cuentas ordenadas por fecha mas antigua de creacion:" << std::endl;
+                    listaCuentas.mostrarCuentasConFecha();
+                    system("pause");
+                    break;
+                case 5:
+                    listaCuentas.ordenarPorCampo(3);
+                    std::cout << "Cuentas ordenadas por fecha mas nueva de creacion:" << std::endl;
+                    listaCuentas.mostrarCuentasConFecha();
+                    system("pause");
+                    break;
+                case 6:
+                    regresar = true;
+                    break;
+            }
+        }
+    }
+}
+
 int main() {
     // Cargar cuentas desde el archivo si existe
     listaCuentas.cargarCuentasDesdeArchivo("cuentas.txt");
@@ -705,20 +798,20 @@ int main() {
     while (!salir) {
         imprimirMenu(opcion);
         int tecla = _getch();
-        if (tecla == 224) { // Tecla especial
+        if (tecla == 224) {
             tecla = _getch();
-        if (tecla == 72) { // Flecha arriba
-            if (opcion > 0)
-                opcion--;
-            else
-                opcion = 9; // Ahora hay 8 opciones (0-7)
-        } else if (tecla == 80) { // Flecha abajo
-            if (opcion < 9)
-                opcion++;
-            else
-                opcion = 0;
-        }
-        } else if (tecla == 13) { // Enter
+            if (tecla == 72) {
+                if (opcion > 0)
+                    opcion--;
+                else
+                    opcion = 13; // Ahora hay 12 opciones (0-11)
+            } else if (tecla == 80) {
+                if (opcion < 13)
+                    opcion++;
+                else
+                    opcion = 0;
+            }
+        } else if (tecla == 13) {
             switch (opcion) {
                 case 0: { // Crear nueva cuenta
                     int tipo = submenuTipoCuenta();
@@ -773,7 +866,7 @@ int main() {
                     system("pause");
                     break;
                 }
-                                case 1: { // Iniciar sesion para tramites
+                case 1: { // Iniciar sesion para tramites
                     system("cls");
                     // Verifica si hay cuentas
                     if (!listaCuentas.getNodoCabeza()) {
@@ -789,20 +882,19 @@ int main() {
                 
                     Cuenta* cuentasUsuario[2] = {nullptr, nullptr};
                     int cuentaCount = listaCuentas.buscarCuentasPorCedulaYContrasena(cedula, contrasena, cuentasUsuario);
-                
                     if (cuentaCount == 0) {
                         cout << "\nUsuario o contrasena incorrectos." << endl;
                         system("pause");
                         break;
                     }
-                
+                    // Registrar acceso exitoso
+                    AccesoUsuario::registrarAcceso(cedula);
                     Cuenta* cuentaSeleccionada = nullptr;
                     if (cuentaCount == 1) {
                         cuentaSeleccionada = cuentasUsuario[0];
                     } else {
                         cuentaSeleccionada = submenuTipoCuentaUsuario(cuentasUsuario, cuentaCount);
                     }
-                
                     menuTransacciones(cuentaSeleccionada);
                     break;
                 }
@@ -878,11 +970,38 @@ int main() {
                     system("pause");
                     break;
                 }
-                case 8: // Ayuda
-                    // Llama directamente a la ventana de ayuda con subsecciones
+                case 8: // Ordenar cuentas
+                    system("cls");
+                    if (!listaCuentas.getNodoCabeza()) {
+                        cout << "No hay cuentas registradas en el sistema." << endl;
+                        system("pause");
+                        break;
+                    }
+                    menuOrdenarCuentas();
+                    break;
+                case 9: // Ayuda
                     VentanaAyuda::Crear(GetModuleHandle(NULL));
                     break;
-                case 9: // Salir
+                case 10: { // Pico de acceso de usuario
+                    system("cls");
+                    std::string cedula = Validar::pedirCedula();
+                    AccesoUsuario::mostrarPicoAcceso(cedula);
+                    system("pause");
+                    break;
+                }
+                case 11: { // Pico de transacciones de usuario
+                    system("cls");
+                    std::string idCuenta = Validar::pedirIdCuenta();
+                    TransaccionesUsuario::mostrarPicoTransacciones(idCuenta);
+                    system("pause");
+                    break;
+                }
+                case 12: // Calcular pago de sobregiro de una cuenta
+                    system("cls");
+                    SimuladorSobregiro::calcularPagoSobregiro(listaCuentas);
+                    system("pause");
+                    break;
+                case 13: // Salir
                     salir = true;
                     break;
             }

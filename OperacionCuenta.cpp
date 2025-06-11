@@ -25,8 +25,23 @@ bool OperacionCuenta::depositar(double monto) {
         std::cout << "No puede depositar mas de $5000 en un solo deposito.\n";
         return false;
     }
-    cuenta.setSaldo(cuenta.getSaldo() + monto);
-    std::cout << "Deposito exitoso. Nuevo saldo: $" << cuenta.getSaldo() << "\n";
+
+    double saldo = cuenta.getSaldo();
+    if (saldo < 0) {
+        // Hay sobregiro, primero paga el sobregiro
+        double montoSobregiro = -saldo;
+        if (monto >= montoSobregiro) {
+            cuenta.setSaldo(0.0 + (monto - montoSobregiro)); // Sobra después de pagar sobregiro
+            fechaInicioSobregiro = 0;
+            std::cout << "Sobregiro pagado en su totalidad. Nuevo saldo: $" << cuenta.getSaldo() << "\n";
+        } else {
+            cuenta.setSaldo(saldo + monto); // Sigue en sobregiro
+            std::cout << "Pago parcial de sobregiro realizado. Queda pendiente: $" << -cuenta.getSaldo() << "\n";
+        }
+    } else {
+        cuenta.setSaldo(saldo + monto);
+        std::cout << "Deposito exitoso. Nuevo saldo: $" << cuenta.getSaldo() << "\n";
+    }
     return true;
 }
 
@@ -83,7 +98,7 @@ bool OperacionCuenta::retirar(double monto) {
                     double usoSobregiro = monto - cuenta.getSaldo();
                     iniciarSobregiro(usoSobregiro);
                     if (sobregirosEsteMes <= LIMITE_SOBREGIROS_MES) {
-                        cuenta.setSaldo(0);
+                        cuenta.setSaldo(cuenta.getSaldo() - monto);
                         std::cout << "Sobregiro aprobado por $" << usoSobregiro << ". Tiene 5 dias para pagar con 0.05% diario de interes.\n";
                     }
                     return true;
@@ -188,11 +203,13 @@ std::ostream& operator<<(std::ostream& os, const OperacionCuenta& op) {
 }
 
 void OperacionCuenta::calcularInteresSobregiro() {
-    if (!tieneSobregiro) return;
+    double saldo = cuenta.getSaldo();
+    if (saldo >= 0) return; // Solo calcula si hay sobregiro
 
     std::time_t ahora = std::time(nullptr);
     int diasPasados = static_cast<int>(std::difftime(ahora, fechaInicioSobregiro) / (60 * 60 * 24));
 
+    double montoSobregiro = -saldo; // El saldo negativo es el sobregiro
     double interes = 0.0;
     if (diasPasados <= 5) {
         interes = montoSobregiro * 0.0005 * diasPasados; 
@@ -223,29 +240,32 @@ void OperacionCuenta::mostrarEstadoSobregiro() const {
 }
 
 void OperacionCuenta::pagarSobregiro(double monto) {
-    if (!tieneSobregiro) {
+    double saldo = cuenta.getSaldo();
+    if (saldo >= 0) {
         std::cout << "No tiene sobregiro activo.\n";
         return;
     }
-    // Permitir pagar hasta el monto exacto (con tolerancia a decimales)
+    double montoSobregiro = -saldo; // Sobregiro actual (positivo)
     double tolerancia = 0.01;
+
+    // Solo puede pagar si tiene suficiente dinero depositado (saldo positivo)
     if (monto > montoSobregiro + tolerancia) {
         std::cout << "No puede pagar mas del monto pendiente de sobregiro. Pendiente: $" << montoSobregiro << "\n";
         return;
     }
-    if (cuenta.getSaldo() < monto - tolerancia) {
+    if (monto > (saldo + montoSobregiro + tolerancia)) { // saldo + montoSobregiro == 0 si no ha depositado nada
         std::cout << "Saldo insuficiente en la cuenta para pagar el sobregiro. Saldo actual: $" << cuenta.getSaldo() << "\n";
         return;
     }
-    if (monto >= montoSobregiro - tolerancia) {
+
+    cuenta.setSaldo(saldo + monto);
+
+    if (cuenta.getSaldo() >= -tolerancia) {
         std::cout << "Sobregiro pagado en su totalidad.\n";
-        cuenta.setSaldo(cuenta.getSaldo() - montoSobregiro);
-        montoSobregiro = 0;
-        tieneSobregiro = false;
+        cuenta.setSaldo(std::max(0.0, cuenta.getSaldo()));
+        fechaInicioSobregiro = 0;
     } else {
-        montoSobregiro -= monto;
-        cuenta.setSaldo(cuenta.getSaldo() - monto);
-        std::cout << "Pago parcial de sobregiro realizado. Queda pendiente: $" << montoSobregiro << "\n";
+        double pendiente = -cuenta.getSaldo();
+        std::cout << "Pago parcial de sobregiro realizado. Queda pendiente: $" << pendiente << "\n";
     }
-    
 }

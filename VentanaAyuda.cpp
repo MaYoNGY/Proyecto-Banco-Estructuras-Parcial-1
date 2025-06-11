@@ -12,6 +12,8 @@ L"Iniciar sesión para trámites:\n\nAntes de hacer cualquier operación en el s
 L"Consultas avanzadas:\n\n¿Quieres ver tus movimientos bancarios con más detalle? \nCon esta opción puedes buscar y filtrar tus transacciones por nombre, apellido, fecha, tipo de cuenta, y más. \nEs ideal si necesitas revisar tus depósitos, retiros o simplemente tener control total de tus operaciones. Puedes combinar varios filtros a la vez para encontrar exactamente lo que buscas.",
 L"Generar Backup:\n\nCon esta función puedes crear una copia de seguridad de todos tus datos bancarios. \nEl sistema guarda automáticamente una copia del archivo con la fecha y hora exacta, así nunca se pierde información importante. \nPuedes usar esta opción cada vez que lo necesites, sin preocuparte por sobrescribir las versiones anteriores.",
 L"Restaurar Backup:\n\nSi en algún momento ocurre un error o necesitas volver a un estado anterior de tus datos,\n esta opción te permite restaurar una copia de seguridad previamente guardada. Todo quedará tal y como estaba en el momento del respaldo: cuentas, saldos, movimientos y configuración.",
+L"Cifrado: \n\nPara proteger tu información, el sistema utiliza cifrado avanzado. \nEsto significa que todos tus datos personales y transacciones se guardan de forma segura, \nasegurando que nadie más pueda acceder a ellos sin tu permiso. \nEl cifrado garantiza la privacidad y seguridad de tu información bancaria.",
+L"Descifrado: \n\nCuando necesitas acceder a tus datos, el sistema descifra la información de forma segura. \nEsto asegura que solo tú puedas ver y manipular tus datos personales y transacciones. \nEl proceso de descifrado es rápido y eficiente, manteniendo siempre la seguridad de tu información.",
 L"Ayuda:\n\n¿Primera vez usando el sistema? No te preocupes. Aquí encontrarás una guía paso a paso que te explica cómo usar cada parte del programa: \ndesde crear tu cuenta, iniciar sesión, hacer depósitos y retiros, hasta proteger tus datos y hacer respaldos. \nTodo explicado de forma sencilla para que no te pierdas.",
 L"Salir:\n\nCuando termines de usar el sistema,\n utiliza esta opción para salir de manera segura. Así te aseguras de que todos tus datos queden bien guardados y no se pierda nada.\n El sistema se cierra correctamente y libera toda la información de forma ordenada."
 
@@ -44,10 +46,12 @@ void VentanaAyuda::Crear(HINSTANCE hInstance) {
         L"Consultas avanzadas",
         L"Generar Backup",
         L"Restaurar Backup",
+        L"Cifrado",
+        L"Descifrado",
         L"Ayuda",
         L"Salir"
     };
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 9; i++) {
         hwndModuloBtns[i] = CreateWindowW(
             L"BUTTON", modulos[i],
             WS_VISIBLE | WS_CHILD | BS_LEFT,
@@ -99,4 +103,3 @@ LRESULT CALLBACK VentanaAyuda::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARA
     }
     return 0;
 }
-

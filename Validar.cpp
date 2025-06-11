@@ -214,6 +214,7 @@ bool Validar::validarCedulaEcuatoriana(const std::string& cedula) {
 
     return digitoVerificadorCalculado == digitoVerificadorReal;
 }
+
 std::string Validar::pedirIdCuenta() {
     std::string id;
     do {
@@ -233,7 +234,7 @@ std::string Validar::pedirIdCuenta() {
                 }
             }
             // Permitir letras y números
-            else if (c >= '0' && c <= '9') {
+            else if (c >= '0' && c <= '9' && id.length() < 9) {
                 id += c;
                 std::cout << c;
             }
@@ -514,3 +515,74 @@ std::string Validar::pedirDato() {
     return dato;
 }
 
+int Validar::pedirPlazoMeses() {
+    int plazoMeses = 0;
+    std::string plazoStr;
+    std::cout << "Ingrese el plazo en meses para saldar el sobregiro: ";
+    while (true) {
+        plazoStr.clear();
+        char c;
+        while (true) {
+            c = _getch();
+            if (c == 13) { // Enter
+                std::cout << std::endl;
+                break;
+            } else if (c == 8) { // Backspace
+                if (!plazoStr.empty()) {
+                    plazoStr.pop_back();
+                    std::cout << "\b \b";
+                }
+            } else if (c >= '0' && c <= '9' && plazoStr.length() < 2) {
+                plazoStr += c;
+                std::cout << c;
+            }
+        }
+        try {
+            plazoMeses = std::stoi(plazoStr);
+            if (plazoMeses > 0) break;
+            else std::cout << "Plazo debe ser mayor a 0. Intente de nuevo: ";
+        } catch (...) {
+            std::cout << "Entrada invalida. Intente de nuevo: ";
+        }
+    }
+    return plazoMeses;
+}
+
+double Validar::pedirTasaAnual() {
+    double tasaAnual = 0;
+    std::string tasaStr;
+    std::cout << "Ingrese la tasa de interes anual (%): ";
+    while (true) {
+        tasaStr.clear();
+        bool punto = false;
+        char c;
+        while (true) {
+            c = _getch();
+            if (c == 13) { // Enter
+                std::cout << std::endl;
+                break;
+            } else if (c == 8) { // Backspace
+                if (!tasaStr.empty()) {
+                    if (tasaStr.back() == '.') punto = false;
+                    tasaStr.pop_back();
+                    std::cout << "\b \b";
+                }
+            } else if (c >= '0' && c <= '9' && tasaStr.length() < 4) {
+                tasaStr += c;
+                std::cout << c;
+            } else if (c == '.' && !punto && !tasaStr.empty()) {
+                tasaStr += c;
+                punto = true;
+                std::cout << c;
+            }
+        }
+        try {
+            tasaAnual = std::stod(tasaStr);
+            if (tasaAnual > 0) break;
+            else std::cout << "Tasa debe ser mayor a 0. Intente de nuevo: ";
+        } catch (...) {
+            std::cout << "Entrada invalida. Intente de nuevo: ";
+        }
+    }
+    return tasaAnual;
+}

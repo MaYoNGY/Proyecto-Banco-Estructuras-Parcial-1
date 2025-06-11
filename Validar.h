@@ -27,6 +27,9 @@ public:
    static std::string pedirNombreArchivoDecifrado();
    static int pedirClaveNumericaCi();
    static std::string pedirDato();
+   static int pedirPlazoMeses();
+   static double pedirTasaAnual();
+   
 
 };
 

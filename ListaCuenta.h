@@ -5,6 +5,7 @@
 #include "NodoCuenta.h"
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 #include "Cuenta.h"
 #include "Persona.h"
 #include "TipoCuenta.h"
@@ -76,6 +77,26 @@ public:
     } while (actual != cabeza);
    }
 
+void mostrarCuentasConFecha() const {
+    if (!cabeza) {
+        std::cout << "No hay cuentas en la lista." << std::endl;
+        return;
+    }
+    NodoCuenta<T>* actual = cabeza;
+    do {
+        Fecha fecha = actual->getDato().getFechaCreacion();       
+        std::cout << "ID: " << actual->getDato().getIdCuenta()
+                  << ", Cedula: " << actual->getDato().getCedula()
+                  << ", Nombre: " << actual->getDato().getNombre()
+                  << ", Apellido: " << actual->getDato().getApellido()
+                  << ", Saldo: " << actual->getDato().getSaldo()
+                  << ", Tipo: " << actual->getDato().getTipo().getTipo()
+                  << ", Fecha de Creacion: "
+                  << fecha.getDia() << "/" << fecha.getMes() << "/" << fecha.getAnio()
+                  << std::endl;
+        actual = actual->getSiguiente();
+    } while (actual != cabeza);
+}
    /*void eliminarCuenta(int idCuenta) {
        if (!cabeza) {
            std::cout << "No hay cuentas en la lista." << std::endl;
@@ -399,6 +420,83 @@ void buscarCuentasPorDato(const std::string& valor) const {
     if (!encontrada) {
         std::cout << "No se encontraron cuentas con el dato: " << valor << std::endl;
     }
+}
+
+// Ordena la lista de cuentas por nombre, apellido o fecha usando selection sort
+   void ordenarPorCampo(int campo) {
+    if (!cabeza || cabeza == cabeza->getSiguiente()) return; // 0 o 1 elemento
+
+    NodoCuenta<T>* actual = cabeza;
+    do {
+        NodoCuenta<T>* menor = actual;
+        NodoCuenta<T>* siguiente = actual->getSiguiente();
+
+        while (siguiente != cabeza) {
+            bool esMenor = false;
+
+            switch (campo) {
+                case 0: { // Nombre A-Z
+                    std::string a = siguiente->getDato().getNombre();
+                    std::string b = menor->getDato().getNombre();
+                    std::transform(a.begin(), a.end(), a.begin(), ::tolower);
+                    std::transform(b.begin(), b.end(), b.begin(), ::tolower);
+                    esMenor = a < b;
+                    break;
+                }
+                case 1: { // Apellido A-Z
+                    std::string a = siguiente->getDato().getApellido();
+                    std::string b = menor->getDato().getApellido();
+                    std::transform(a.begin(), a.end(), a.begin(), ::tolower);
+                    std::transform(b.begin(), b.end(), b.begin(), ::tolower);
+                    esMenor = a < b;
+                    break;
+                }
+                case 2: { // Fecha más antigua
+                    Fecha f1 = siguiente->getDato().getFechaCreacion();
+                    Fecha f2 = menor->getDato().getFechaCreacion();
+                    if (f1.getAnio() != f2.getAnio()) esMenor = f1.getAnio() < f2.getAnio();
+                    else if (f1.getMes() != f2.getMes()) esMenor = f1.getMes() < f2.getMes();
+                    else esMenor = f1.getDia() < f2.getDia();
+                    break;
+                }
+                case 3: { // Fecha más nueva
+                Fecha f1 = siguiente->getDato().getFechaCreacion();
+                Fecha f2 = menor->getDato().getFechaCreacion();
+                if (f1.getAnio() != f2.getAnio()) esMenor = f1.getAnio() > f2.getAnio();
+                else if (f1.getMes() != f2.getMes()) esMenor = f1.getMes() > f2.getMes();
+                else esMenor = f1.getDia() > f2.getDia();
+                break;
+                }
+                case 4: { // Nombre Z-A
+                    std::string a = siguiente->getDato().getNombre();
+                    std::string b = menor->getDato().getNombre();
+                    std::transform(a.begin(), a.end(), a.begin(), ::tolower);
+                    std::transform(b.begin(), b.end(), b.begin(), ::tolower);
+                    esMenor = a > b;
+                    break;
+                }
+                case 5: { // Apellido Z-A
+                    std::string a = siguiente->getDato().getApellido();
+                    std::string b = menor->getDato().getApellido();
+                    std::transform(a.begin(), a.end(), a.begin(), ::tolower);
+                    std::transform(b.begin(), b.end(), b.begin(), ::tolower);
+                    esMenor = a > b;
+                    break;
+                }
+            }
+
+            if (esMenor) menor = siguiente;
+            siguiente = siguiente->getSiguiente();
+        }
+
+        if (menor != actual) {
+            T temp = actual->getDato();
+            actual->getDato() = menor->getDato();
+            menor->getDato() = temp;
+        }
+
+        actual = actual->getSiguiente();
+    } while (actual != cabeza);
 }
 
 };
