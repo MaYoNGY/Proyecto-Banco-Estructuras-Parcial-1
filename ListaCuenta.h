@@ -93,6 +93,7 @@ void mostrarCuentasConFecha() const {
                   << ", Tipo: " << actual->getDato().getTipo().getTipo()
                   << ", Fecha de Creacion: "
                   << fecha.getDia() << "/" << fecha.getMes() << "/" << fecha.getAnio()
+                  << " " << fecha.getHora() << ":" << fecha.getMinutos() << ":" << fecha.getSegundos()
                   << std::endl;
         actual = actual->getSiguiente();
     } while (actual != cabeza);
@@ -213,7 +214,6 @@ void mostrarCuentasConFecha() const {
    }
 
    // Método para guardar todas las cuentas en un archivo txt
-// ...existing code...
 void guardarCuentasEnArchivo(const std::string& nombreArchivo) {
     std::ofstream archivo(nombreArchivo, std::ios::out);
     if (!archivo) {
@@ -235,15 +235,17 @@ void guardarCuentasEnArchivo(const std::string& nombreArchivo) {
                 << actual->getDato().getSaldo() << " " // <-- saldo actual
                 << actual->getDato().getFechaCreacion().getDia() << " "
                 << actual->getDato().getFechaCreacion().getMes() << " "
-                << actual->getDato().getFechaCreacion().getAnio()
+                << actual->getDato().getFechaCreacion().getAnio() << " "
+                << actual->getDato().getFechaCreacion().getHora() << " "
+                << actual->getDato().getFechaCreacion().getMinutos() << " "
+                << actual->getDato().getFechaCreacion().getSegundos()
                 << std::endl;
         actual = actual->getSiguiente();
     } while (actual != cabeza);
     archivo.close();
 }
-// ...existing code...
 
-   // Limpia la lista antes de cargar para evitar duplicados
+// Limpia la lista antes de cargar para evitar duplicados
    void limpiarLista() {
       NodoCuenta<T>* actual = cabeza;
       if (!actual) return;
@@ -258,46 +260,51 @@ void guardarCuentasEnArchivo(const std::string& nombreArchivo) {
 
    // Método robusto para cargar cuentas desde un archivo txt
    void cargarCuentasDesdeArchivo(const std::string& nombreArchivo) {
-      std::ifstream archivo(nombreArchivo);
-      if (!archivo.is_open()) {
-         std::cerr << "Error al abrir el archivo " << nombreArchivo << " para lectura.\n";
-         return;
-      }
+  std::ifstream archivo(nombreArchivo);
+  if (!archivo.is_open()) {
+     std::cerr << "Error al abrir el archivo " << nombreArchivo << " para lectura.\n";
+     return;
+  }
 
-      limpiarLista(); // Limpia la lista antes de cargar
+  limpiarLista(); // Limpia la lista antes de cargar
 
-      std::string linea;
-    // ...existing code...
-    while (std::getline(archivo, linea)) {
-        if (linea.empty()) continue;
-        std::istringstream iss(linea);
-        std::string idCuenta, cedula, nombre, apellido, tipo, contrasena;
-        double saldo;
-        int dia, mes, anio;
+  std::string linea;
+  while (std::getline(archivo, linea)) {
+    if (linea.empty()) continue;
+    std::istringstream iss(linea);
+    std::string idCuenta, cedula, nombre, apellido, tipo, contrasena;
+    double saldo;
+    int dia, mes, anio, hora, minutos, segundos;
+
+    // Lee los campos en el mismo orden en que se guardaron
+    if (!(iss >> idCuenta >> cedula >> nombre >> apellido >> tipo 
+          >> contrasena >> saldo >> dia >> mes >> anio 
+          >> hora >> minutos >> segundos)) {
+        std::cerr << "Error de formato en la línea: " << linea << std::endl;
+        continue;
+    }
+
+    // Validación básica de datos
+    if (idCuenta.empty() || cedula.empty() || nombre.empty() || apellido.empty() || tipo.empty() || contrasena.empty())
+        continue;
+
+    Fecha fechaCreacion;
+    fechaCreacion.setDia(dia);
+    fechaCreacion.setMes(mes);
+    fechaCreacion.setAnio(anio);
+    fechaCreacion.setHora(hora);
+    fechaCreacion.setMinutos(minutos);
+    fechaCreacion.setSegundos(segundos);
+
+    TipoCuenta tipoCuenta(tipo);
+    Persona persona(cedula, nombre, apellido);
+    Cuenta cuenta(idCuenta, persona, saldo, tipoCuenta, contrasena, fechaCreacion);
     
-        // Lee los campos en el mismo orden en que se guardaron
-        if (!(iss >> idCuenta >> cedula >> nombre >> apellido >> tipo >> contrasena >> saldo >> dia >> mes >> anio)) {
-            std::cerr << "Error de formato en la línea: " << linea << std::endl;
-            continue;
-        }
     
-        // Validación básica de datos
-        if (idCuenta.empty() || cedula.empty() || nombre.empty() || apellido.empty() || tipo.empty() || contrasena.empty())
-            continue;
-    
-        Fecha fechaCreacion;
-        fechaCreacion.setDia(dia);
-        fechaCreacion.setMes(mes);
-        fechaCreacion.setAnio(anio);
-    
-        TipoCuenta tipoCuenta(tipo);
-        Persona persona(cedula, nombre, apellido);
-        Cuenta cuenta(idCuenta, persona, saldo, tipoCuenta, contrasena, fechaCreacion);
-        insertarCuenta(cuenta);
-    // ...existing code...
-      }
-      archivo.close();
-   }
+    insertarCuenta(cuenta);
+  }
+  archivo.close();
+}
 
 void buscarCuentasPorNombre(const std::string& nombreCompleto) const {
     if (!cabeza) {

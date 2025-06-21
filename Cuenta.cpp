@@ -13,8 +13,25 @@ extern unsigned long long contadorId;
 // Genera un ID de cuenta incremental con ceros a la izquierda
 void Cuenta::generarIdCuenta() {
     std::ostringstream oss;
-    oss << std::setw(9) << std::setfill('0') << contadorId++;
+    oss << std::setw(10) << std::setfill('0') << contadorId++;
     idCuenta = oss.str();
+    
+    // Generar el número de cuenta completo con formato ecuatoriano
+    std::string codigoPais = "EC";
+    std::string codigoEntidad = "0001";
+    std::string codigoOficina = "0001";
+    
+    // Cálculo simple de dígitos de control
+    int suma = 0;
+    for (char c : idCuenta) suma += c - '0';
+    int digitoControl = suma % 100;
+    
+    std::ostringstream ossCompleto;
+    ossCompleto << codigoPais << codigoEntidad << codigoOficina
+               << std::setw(2) << std::setfill('0') << digitoControl
+               << idCuenta;
+    
+    numeroCuentaCompleto = ossCompleto.str();
 }
 
 // Devuelve el ID de cuenta como string
@@ -59,7 +76,7 @@ void Cuenta::setSaldo(double newSaldo) {
 // Constructor corregido: NO recibe id, el id se genera con generarIdCuenta()
 Cuenta::Cuenta(const Persona& persona, double saldo, TipoCuenta tipo)
     : persona(persona), saldo(saldo), tipo(tipo) {
-    generarIdCuenta();
+    generarIdCuenta();  // Esto ya establece idCuenta y numeroCuentaCompleto
     fechaCreacion.inicializarConFechaActual();
 }
 
@@ -87,4 +104,13 @@ void Cuenta::setFechaCreacion(const Fecha& fecha) {
 
 Fecha Cuenta::getFechaCreacion() const { 
    return fechaCreacion; 
+}
+
+// Métodos para el número de cuenta bancaria completo
+std::string Cuenta::getNumeroCuentaCompleto() const {
+    return numeroCuentaCompleto;
+}
+
+void Cuenta::setNumeroCuentaCompleto(const std::string& numero) {
+    numeroCuentaCompleto = numero;
 }

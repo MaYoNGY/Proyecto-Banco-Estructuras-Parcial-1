@@ -64,71 +64,71 @@ public:
    }
 
    void mostrarTransacciones(const std::string& idCuenta, const std::string& tipo) const {
-       if (!cabeza) {
-           std::cout << "No hay transacciones en la lista." << std::endl;
-           return;
-       }
-       NodoTransaccion<T>* actual = cabeza;
-       bool encontrada = false;
-       do {
-           T trans = actual->getDato();
-           auto cuenta = trans.getCuenta();
-           auto tipoCuenta = cuenta.getTipo();
-           auto tipoTrans = trans.getTipoTransaccion();
-           auto fecha = trans.getFecha();
-   
-           // Solo muestra si el ID de cuenta coincide
-           if (cuenta.getIdCuenta() == idCuenta) {
-               // Filtra por tipo de transacción si lo deseas
-               if (tipo == "ahorro" && (
-                   tipoTrans.getTipo() == "Consulta de saldo-ahorro" ||
-                   tipoTrans.getTipo() == "Deposito-ahorro" ||
-                   tipoTrans.getTipo() == "Retiro-ahorro")) {
-                   std::cout << "Cuenta ID: " << cuenta.getIdCuenta()
-                       << ", Nombre: " << cuenta.getNombre()
-                       << ", Apellido: " << cuenta.getApellido()
-                       << ", Cedula: " << cuenta.getCedula()
-                       << ", Tipo de Cuenta: " << tipoCuenta.getTipo()
-                       << ", Saldo: " << cuenta.getSaldo()
-                       << ", Tipo de Transaccion: " << tipoTrans.getTipo()
-                       << ", Monto: " << trans.getMonto()
-                       << ", Fecha: " << fecha.getDia() << "/"
-                       << fecha.getMes() << "/"
-                       << fecha.getAnio()
-                       << std::endl;
-                   encontrada = true;
-               }
-               if (tipo == "corriente" && (
-                   tipoTrans.getTipo() == "Consulta de saldo-corriente" ||
-                   tipoTrans.getTipo() == "Deposito-corriente" ||
-                   tipoTrans.getTipo() == "Retiro-corriente" ||
-                   tipoTrans.getTipo() == "Estado de sobregiro-corriente" ||
-                   tipoTrans.getTipo() == "Calculo de interes de sobregiro-corriente" ||
-                   tipoTrans.getTipo() == "Pago de sobregiro-corriente")) {
-                   std::cout << "Cuenta ID: " << cuenta.getIdCuenta()
-                       << ", Nombre: " << cuenta.getNombre()
-                       << ", Apellido: " << cuenta.getApellido()
-                       << ", Cedula: " << cuenta.getCedula()
-                       << ", Tipo de Cuenta: " << tipoCuenta.getTipo()
-                       << ", Saldo: " << cuenta.getSaldo()
-                       << ", Tipo de Transaccion: " << tipoTrans.getTipo()
-                       << ", Monto: " << trans.getMonto()
-                       << ", Fecha: " << fecha.getDia() << "/"
-                       << fecha.getMes() << "/"
-                       << fecha.getAnio()
-                       << std::endl;
-                   encontrada = true;
-               }
-           }
-           actual = actual->getSiguiente();
-       } while (actual != cabeza);
-       if (!encontrada) {
-           std::cout << "No se encontraron transacciones para esa cuenta." << std::endl;
-       }
-   }
+    if (!cabeza) {
+        std::cout << "No hay transacciones en la lista." << std::endl;
+        return;
+    }
+    NodoTransaccion<T>* actual = cabeza;
+    bool encontrada = false;
+    do {
+        T trans = actual->getDato();
+        auto cuenta = trans.getCuenta();
+        auto tipoCuenta = cuenta.getTipo();
+        auto tipoTrans = trans.getTipoTransaccion();
+        auto fecha = trans.getFecha();
 
+        if (cuenta.getIdCuenta() == idCuenta) {
+            if (tipo == "ahorro" && (
+                tipoTrans.getTipo() == "Consulta de saldo-ahorro" ||
+                tipoTrans.getTipo() == "Deposito-ahorro" ||
+                tipoTrans.getTipo() == "Retiro-ahorro")) {
+                std::cout << "Cuenta ID: " << cuenta.getIdCuenta()
+                          << ", Nombre: " << cuenta.getNombre()
+                          << ", Apellido: " << cuenta.getApellido()
+                          << ", Cedula: " << cuenta.getCedula()
+                          << ", Tipo de Cuenta: " << tipoCuenta.getTipo()
+                          << ", Saldo: " << cuenta.getSaldo()
+                          << ", Tipo de Transaccion: " << tipoTrans.getTipo()
+                          << ", Monto: " << trans.getMonto()
+                          << ", Fecha: " << fecha.getDia() << "/"
+                          << fecha.getMes() << "/"
+                          << fecha.getAnio()
+                          << " Hora: " << fecha.getHora() << ":"
+                          << fecha.getMinutos() << ":"
+                          << fecha.getSegundos()
+                          << std::endl;
+                encontrada = true;
+            } else if (tipo == "corriente" && (
+                tipoTrans.getTipo() == "Consulta de saldo-corriente" ||
+                tipoTrans.getTipo() == "Deposito-corriente" ||
+                tipoTrans.getTipo() == "Retiro-corriente" ||
+                tipoTrans.getTipo() == "Sobregiro-corriente")) {
+                std::cout << "Cuenta ID: " << cuenta.getIdCuenta()
+                          << ", Nombre: " << cuenta.getNombre()
+                          << ", Apellido: " << cuenta.getApellido()
+                          << ", Cedula: " << cuenta.getCedula()
+                          << ", Tipo de Cuenta: " << tipoCuenta.getTipo()
+                          << ", Saldo: " << cuenta.getSaldo()
+                          << ", Tipo de Transaccion: " << tipoTrans.getTipo()
+                          << ", Monto: " << trans.getMonto()
+                          << ", Fecha: " << fecha.getDia() << "/"
+                          << fecha.getMes() << "/"
+                          << fecha.getAnio()
+                          << " Hora: " << fecha.getHora() << ":"
+                          << fecha.getMinutos() << ":"
+                          << fecha.getSegundos()
+                          << std::endl;
+                encontrada = true;
+            }
+        }
+        actual = actual->getSiguiente();
+    } while (actual != cabeza);
+    if (!encontrada) {
+        std::cout << "No se encontraron transacciones para esa cuenta." << std::endl;
+    }
+}
 
-      void mostrarTransaccionesPorFecha(int dia, int mes, int anio) const {
+   void mostrarTransaccionesPorFecha(int dia, int mes, int anio) const {
        if (!cabeza) {
            std::cout << "No hay transacciones en la lista." << std::endl;
            return;
@@ -155,6 +155,9 @@ public:
                    << ", Fecha: " << fecha.getDia() << "/"
                    << fecha.getMes() << "/"
                    << fecha.getAnio()
+                   << " Hora: " << fecha.getHora() << ":"
+                   << fecha.getMinutos() << ":"
+                   << fecha.getSegundos()                   
                    << std::endl;
                encontrado = true;
            }
@@ -197,6 +200,9 @@ public:
                  << ", Fecha: " << fecha.getDia() << "/"
                  << fecha.getMes() << "/"
                  << fecha.getAnio()
+                 << " Hora: " << fecha.getHora() << ":"
+                 << fecha.getMinutos() << ":"
+                 << fecha.getSegundos() 
                  << std::endl;
          actual = actual->getSiguiente();
       } while (actual != cabeza);
@@ -230,7 +236,10 @@ public:
                    << trans.getMonto() << " "
                    << fecha.getDia() << " "
                    << fecha.getMes() << " "
-                   << fecha.getAnio()
+                   << fecha.getAnio() << " "
+                   << fecha.getHora() << " "
+                   << fecha.getMinutos() << " "
+                   << fecha.getSegundos()
                    << std::endl;
            actual = actual->getSiguiente();
        } while (actual != cabeza);
@@ -251,43 +260,68 @@ public:
    }
 
       void cargarTransaccionesDesdeArchivo(const std::string& nombreArchivo) {
-       std::ifstream archivo(nombreArchivo);
-       if (!archivo.is_open()) {
-           std::cerr << "Error al abrir el archivo " << nombreArchivo << " para lectura.\n";
-           return;
-       }
-   
-       limpiarLista();
-   
-       std::string linea;
-       while (std::getline(archivo, linea)) {
-           if (linea.empty()) continue;
-   
-           std::istringstream iss(linea);
-           std::string idCuenta, nombre, cedula, tipoCuenta, tipoTransaccion;
-           double saldo, monto;
-           int dia, mes, anio;
-   
-           if (!(iss >> idCuenta >> nombre >> cedula >> tipoCuenta >> saldo >> tipoTransaccion >> monto >> dia >> mes >> anio)) {
-               std::cerr << "Error de formato en la línea: " << linea << std::endl;
-               continue;
-           }
-   
-           Fecha fecha;
-           fecha.setDia(dia);
-           fecha.setMes(mes);
-           fecha.setAnio(anio);
-   
-           TipoCuenta tipoCuentaObj(tipoCuenta);
-           Persona persona(cedula, nombre, ""); // Apellido vacío si no lo guardas
-           Cuenta cuenta(idCuenta, persona, saldo, tipoCuentaObj, "", fecha);
-           TipoTransaccion tipoTrans(tipoTransaccion);
-   
-           T transaccion(cuenta, tipoTrans, monto, fecha);
-           insertarTransaccion(transaccion);
-       }
-       archivo.close();
-   }
+    std::ifstream archivo(nombreArchivo);
+    if (!archivo.is_open()) {
+        std::cerr << "Error al abrir el archivo " << nombreArchivo << " para lectura.\n";
+        return;
+    }
+
+    limpiarLista(); // Limpia la lista antes de cargar para evitar duplicados
+
+    std::string linea;
+    while (std::getline(archivo, linea)) {
+        if (linea.empty()) continue;
+
+        std::istringstream iss(linea);
+        std::string idCuenta, nombre, cedula, tipoCuenta, tipoTransaccion;
+        double saldo, monto;
+        int dia, mes, anio, hora, minutos, segundos;
+
+        // Leer todos los datos, incluyendo la hora
+        if (!(iss >> idCuenta >> nombre >> cedula >> tipoCuenta >> saldo >> tipoTransaccion >> monto >> dia >> mes >> anio >> hora >> minutos >> segundos)) {
+            std::cerr << "Error de formato en la línea: " << linea << std::endl;
+            continue;
+        }
+
+        // Crear los objetos necesarios para la transacción
+        Fecha fecha;
+        fecha.setDia(dia);
+        fecha.setMes(mes);
+        fecha.setAnio(anio);
+        fecha.setHora(hora);
+        fecha.setMinutos(minutos);
+        fecha.setSegundos(segundos);
+
+        TipoCuenta tipoCuentaObj(tipoCuenta);
+        Persona persona(cedula, nombre, ""); // Apellido vacío si no lo guardas
+        Cuenta cuenta(idCuenta, persona, saldo, tipoCuentaObj, "", fecha);
+        TipoTransaccion tipoTrans(tipoTransaccion);
+
+        T transaccion(cuenta, tipoTrans, monto, fecha);
+        insertarTransaccion(transaccion); // Insertar la transacción en la lista
+    }
+    archivo.close();
+}
+
+   void registrarTransaccionConFecha(const T& transaccion) {
+    // Obtener la fecha y hora actual del sistema
+    time_t now = time(0);
+    tm* ltm = localtime(&now);
+    Fecha fechaActual;
+    fechaActual.setDia(ltm->tm_mday);
+    fechaActual.setMes(1 + ltm->tm_mon);
+    fechaActual.setAnio(1900 + ltm->tm_year);
+    fechaActual.setHora(ltm->tm_hour);
+    fechaActual.setMinutos(ltm->tm_min);
+    fechaActual.setSegundos(ltm->tm_sec);
+
+    // Crear una copia de la transacción con la fecha y hora actual
+    T transaccionConFecha = transaccion;
+    transaccionConFecha.setFecha(fechaActual);
+
+    // Insertar la transacción en la lista
+    insertarTransaccion(transaccionConFecha);
+}
        
 };
 

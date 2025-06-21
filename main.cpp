@@ -41,6 +41,18 @@ ListaTransaccion<Transaccion> listaTransacciones;
 unsigned long long contadorId = 1;
 
 int leerUltimoIdCuenta() {
+    // Primero verificamos si hay cuentas
+    if (!listaCuentas.getNodoCabeza()) {
+        // No hay cuentas, reiniciamos el contador
+        std::ofstream archivo("ultimo_id.txt", std::ios::trunc);
+        if (archivo.is_open()) {
+            archivo << 0;
+            archivo.close();
+        }
+        return 0;
+    }
+
+    // Si hay cuentas, procedemos normalmente
     std::ifstream archivo("ultimo_id.txt");
     int ultimoId = 0;
     if (archivo.is_open()) {
@@ -150,9 +162,8 @@ void menuTransacciones(Cuenta* cuenta) {
         "4. Mostrar historial",
         "5. Mostrar estado de sobregiro",
         "6. Calcular intereses de sobregiro",
-        "7. Pagar sobregiro",
-        "8. Regresar",
-        "9. Eliminar cuenta"
+        "7. Regresar",
+        "8. Eliminar cuenta"
     };
     string opcionesAhorro[6] = {
         "1. Consultar saldo",
@@ -169,10 +180,17 @@ void menuTransacciones(Cuenta* cuenta) {
         system("cls");
         cout << "===== Menu de Transacciones =====" << endl;
         cout << "Cuenta: " << cuenta->getTipo().getTipo() << " | ID: " << cuenta->getIdCuentaStr() << endl;
-        Fecha fechaCreacion = cuenta->getFechaCreacion();
-        cout << "Fecha de creacion: " << fechaCreacion.getDia() << "/" << fechaCreacion.getMes() << "/" << fechaCreacion.getAnio() << endl;
-        for (int i = 0; i < (esCorriente ? 9 : 6); i++) {
-            if ( (esCorriente && i == opcion) || (!esCorriente && i == opcion) )
+        cout << "Numero de cuenta bancario completo: " << cuenta->getNumeroCuentaCompleto() << endl;
+
+        // Mostrar la fecha y hora actual del sistema
+        Fecha fechaActual;
+        fechaActual.inicializarConFechaActual();
+        cout << "Fecha y hora actual: ";
+        fechaActual.mostrarFechaHora();
+        cout << endl;
+
+        for (int i = 0; i < (esCorriente ? 8 : 6); i++) {
+            if ((esCorriente && i == opcion) || (!esCorriente && i == opcion))
                 cout << ">> " << (esCorriente ? opcionesCorriente[i] : opcionesAhorro[i]) << endl;
             else
                 cout << "   " << (esCorriente ? opcionesCorriente[i] : opcionesAhorro[i]) << endl;
@@ -184,9 +202,9 @@ void menuTransacciones(Cuenta* cuenta) {
                 if (opcion > 0)
                     opcion--;
                 else
-                    opcion = (esCorriente ? 8 : 5);
+                    opcion = (esCorriente ? 7 : 5);
             } else if (tecla == 80) { // Flecha abajo
-                if (opcion < (esCorriente ? 8 : 5))
+                if (opcion < (esCorriente ? 7 : 5))
                     opcion++;
                 else
                     opcion = 0;
@@ -198,11 +216,14 @@ void menuTransacciones(Cuenta* cuenta) {
                         system("cls");
                         cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
                         cout <<"tipo de transaccion: consulta de saldo" << endl;
-                        cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
-                             << cuenta->getFechaCreacion().getMes() << "/" 
-                             << cuenta->getFechaCreacion().getAnio() << endl;
+                        // Mostrar la fecha y hora actual del sistema
+                        Fecha fechaActual;
+                        fechaActual.inicializarConFechaActual();
+                        cout << "Fecha y hora actual: ";
+                        fechaActual.mostrarFechaHora();
+                        cout << endl;
                         Transaccion transaccion(*cuenta, TipoTransaccion("Consulta de saldo-ahorro"), cuenta->getSaldo(), cuenta->getFechaCreacion());
-                        listaTransacciones.insertarTransaccion(transaccion);
+                        listaTransacciones.registrarTransaccionConFecha(transaccion);
                         listaTransacciones.guardarTransaccionesEnArchivo("transacciones1.txt");
                         listaTransacciones.guardarTransaccionesEnArchivoPr("transacciones.txt");
                         listaCuentas.guardarCuentasEnArchivo("cuentas.txt");
@@ -214,11 +235,14 @@ void menuTransacciones(Cuenta* cuenta) {
                         system("cls");
                         if(double monto = pedirMontoSeguro("Ingrese monto a depositar: $")){
                             operacion += monto;
-                            cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
-                            << cuenta->getFechaCreacion().getMes() << "/" 
-                            << cuenta->getFechaCreacion().getAnio() << endl;
+                            // Mostrar la fecha y hora actual del sistema
+                            Fecha fechaActual;
+                            fechaActual.inicializarConFechaActual();
+                            cout << "Fecha y hora actual: ";
+                            fechaActual.mostrarFechaHora();
+                            cout << endl;
                             Transaccion transaccion(*cuenta, TipoTransaccion("Deposito-ahorro"), monto, cuenta->getFechaCreacion());
-                            listaTransacciones.insertarTransaccion(transaccion);
+                            listaTransacciones.registrarTransaccionConFecha(transaccion);
                             listaTransacciones.guardarTransaccionesEnArchivo("transacciones1.txt");
                             listaTransacciones.guardarTransaccionesEnArchivoPr("transacciones.txt");
                             listaCuentas.guardarCuentasEnArchivo("cuentas.txt");
@@ -232,11 +256,14 @@ void menuTransacciones(Cuenta* cuenta) {
                         if(double monto = pedirMontoSeguro("Ingrese monto a retirar: $")){
                         operacion.retirarAhorroSimple(monto);
                         cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
-                        cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
-                             << cuenta->getFechaCreacion().getMes() << "/" 
-                             << cuenta->getFechaCreacion().getAnio() << endl;
+                        // Mostrar la fecha y hora actual del sistema
+                        Fecha fechaActual;
+                        fechaActual.inicializarConFechaActual();
+                        cout << "Fecha y hora actual: ";
+                        fechaActual.mostrarFechaHora();
+                        cout << endl;
                         Transaccion transaccion(*cuenta, TipoTransaccion("Retiro-ahorro"), monto, cuenta->getFechaCreacion());
-                        listaTransacciones.insertarTransaccion(transaccion);
+                        listaTransacciones.registrarTransaccionConFecha(transaccion);
                         listaTransacciones.guardarTransaccionesEnArchivo("transacciones1.txt");
                         listaTransacciones.guardarTransaccionesEnArchivoPr("transacciones.txt");
                         TransaccionesUsuario::registrarTransaccion(cuenta->getIdCuenta(), -monto);
@@ -308,11 +335,14 @@ void menuTransacciones(Cuenta* cuenta) {
                     case 0:{
                         system("cls");
                         cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
-                        cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
-                             << cuenta->getFechaCreacion().getMes() << "/" 
-                             << cuenta->getFechaCreacion().getAnio() << endl;
+                        // Mostrar la fecha y hora actual del sistema
+                        Fecha fechaActual;
+                        fechaActual.inicializarConFechaActual();
+                        cout << "Fecha y hora actual: ";
+                        fechaActual.mostrarFechaHora();
+                        cout << endl;
                         Transaccion transaccion(*cuenta, TipoTransaccion("Consulta de saldo-corriente"), cuenta->getSaldo(), cuenta->getFechaCreacion());
-                        listaTransacciones.insertarTransaccion(transaccion);
+                        listaTransacciones.registrarTransaccionConFecha(transaccion);
                         listaTransacciones.guardarTransaccionesEnArchivo("transacciones1.txt");
                         listaTransacciones.guardarTransaccionesEnArchivoPr("transacciones.txt");
                         listaCuentas.guardarCuentasEnArchivo("cuentas.txt");
@@ -322,11 +352,14 @@ void menuTransacciones(Cuenta* cuenta) {
                         system("cls");
                         if(double monto = pedirMontoSeguro("Ingrese monto a depositar: $")){
                         operacion += monto;
-                        cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
-                             << cuenta->getFechaCreacion().getMes() << "/" 
-                             << cuenta->getFechaCreacion().getAnio() << endl;
+                        // Mostrar la fecha y hora actual del sistema
+                        Fecha fechaActual;
+                        fechaActual.inicializarConFechaActual();
+                        cout << "Fecha y hora actual: ";
+                        fechaActual.mostrarFechaHora();
+                        cout << endl;
                         Transaccion transaccion(*cuenta, TipoTransaccion("Deposito-corriente"), monto, cuenta->getFechaCreacion());
-                        listaTransacciones.insertarTransaccion(transaccion);
+                        listaTransacciones.registrarTransaccionConFecha(transaccion);
                         listaTransacciones.guardarTransaccionesEnArchivo("transacciones1.txt");
                         listaTransacciones.guardarTransaccionesEnArchivoPr("transacciones.txt");
                         listaCuentas.guardarCuentasEnArchivo("cuentas.txt");
@@ -341,11 +374,14 @@ void menuTransacciones(Cuenta* cuenta) {
                         if(double monto = pedirMontoSeguro("Ingrese monto a retirar: $")){
                         operacion -= monto;   
                         cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
-                        cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
-                             << cuenta->getFechaCreacion().getMes() << "/" 
-                             << cuenta->getFechaCreacion().getAnio() << endl;
+                        // Mostrar la fecha y hora actual del sistema
+                        Fecha fechaActual;
+                        fechaActual.inicializarConFechaActual();
+                        cout << "Fecha y hora actual: ";
+                        fechaActual.mostrarFechaHora();
+                        cout << endl;
                         Transaccion transaccion(*cuenta, TipoTransaccion("Retiro-corriente"), monto, cuenta->getFechaCreacion());
-                        listaTransacciones.insertarTransaccion(transaccion);
+                        listaTransacciones.registrarTransaccionConFecha(transaccion);
                         listaTransacciones.guardarTransaccionesEnArchivo("transacciones1.txt");
                         listaTransacciones.guardarTransaccionesEnArchivoPr("transacciones.txt");
                         listaCuentas.guardarCuentasEnArchivo("cuentas.txt");
@@ -363,11 +399,14 @@ void menuTransacciones(Cuenta* cuenta) {
                     case 4:{
                         system("cls");
                         operacion.mostrarEstadoSobregiro();
-                        cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
-                             << cuenta->getFechaCreacion().getMes() << "/" 
-                             << cuenta->getFechaCreacion().getAnio() << endl;
+                        // Mostrar la fecha y hora actual del sistema
+                        Fecha fechaActual;
+                        fechaActual.inicializarConFechaActual();
+                        cout << "Fecha y hora actual: ";
+                        fechaActual.mostrarFechaHora();
+                        cout << endl;
                         Transaccion transaccion(*cuenta, TipoTransaccion("Estado de sobregiro-corriente"), 0, cuenta->getFechaCreacion());
-                        listaTransacciones.insertarTransaccion(transaccion);
+                        listaTransacciones.registrarTransaccionConFecha(transaccion);
                         listaTransacciones.guardarTransaccionesEnArchivo("transacciones1.txt");
                         listaTransacciones.guardarTransaccionesEnArchivoPr("transacciones.txt");
                         listaCuentas.guardarCuentasEnArchivo("cuentas.txt");
@@ -375,54 +414,28 @@ void menuTransacciones(Cuenta* cuenta) {
                         break;}
                     case 5:{
                         system("cls");
+                        operacion.mostrarEstadoSobregiro();
                         operacion.calcularInteresSobregiro();
-                        cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
-                             << cuenta->getFechaCreacion().getMes() << "/" 
-                             << cuenta->getFechaCreacion().getAnio() << endl;
+                        // Mostrar la fecha y hora actual del sistema
+                        Fecha fechaActual;
+                        fechaActual.inicializarConFechaActual();
+                        cout << "Fecha y hora actual: ";
+                        fechaActual.mostrarFechaHora();
+                        cout << endl;
                         Transaccion transaccion(*cuenta, TipoTransaccion("Calculo de interes de sobregiro-corriente"), 0, cuenta->getFechaCreacion());
-                        listaTransacciones.insertarTransaccion(transaccion);
+                        listaTransacciones.registrarTransaccionConFecha(transaccion);
                         listaTransacciones.guardarTransaccionesEnArchivo("transacciones1.txt");
                         listaTransacciones.guardarTransaccionesEnArchivoPr("transacciones.txt");
                         listaCuentas.guardarCuentasEnArchivo("cuentas.txt");
                         system("pause");
                         break;
                     }
-                    case 6: {
-                        system("cls");
-                        // Solo permite pagar hasta el monto pendiente de sobregiro
-                        //double montoMax = operacion.operator-(0); // saldo - 0 = saldo actual
-                        double montoPagar;
-                        cout << "Ingrese monto a pagar de sobregiro: $";
-                        while (true) {
-                            montoPagar = pedirMontoSeguro("");
-                            // Para obtener el monto pendiente de sobregiro:
-                            // Usamos un cast a double para acceder al atributo privado (no hay getter, así que mejor pedirlo al usuario y validar en pagarSobregiro)
-                            if (montoPagar > 0 && montoPagar <= 5000) { // 5000 es arbitrario, el método ya valida el monto real
-                                operacion.pagarSobregiro(montoPagar);
-                                cout << "Saldo actual: $" << cuenta->getSaldo() << endl;
-                                cout << "Fecha: " << cuenta->getFechaCreacion().getDia() << "/" 
-                                    << cuenta->getFechaCreacion().getMes() << "/" 
-                                    << cuenta->getFechaCreacion().getAnio() << endl;
-                                Transaccion transaccion(*cuenta, TipoTransaccion("Pago de sobregiro-corriente"), montoPagar, cuenta->getFechaCreacion());
-                                listaTransacciones.insertarTransaccion(transaccion);
-                                listaTransacciones.guardarTransaccionesEnArchivo("transacciones1.txt");
-                                listaTransacciones.guardarTransaccionesEnArchivoPr("transacciones.txt");
-                                listaCuentas.guardarCuentasEnArchivo("cuentas.txt");
-                                TransaccionesUsuario::registrarTransaccion(cuenta->getCedula(), -montoPagar);
-                                break;
-                            } else {
-                                cout << "Monto invalido. Intente de nuevo: $";
-                            }
-                        }
 
-                        system("pause");
-                        break;
-                    }
-                    case 7:
+                    case 6:
                         regresar = true;
                         break;
                         
-                    case 8: { // Eliminar cuenta
+                    case 7: { // Eliminar cuenta
                         int confirmOpcion = 0;
                         string opcionesConfirm[] = {"Confirmar eliminacion", "Regresar"};
                         bool confirmar = false;
@@ -602,36 +615,61 @@ void menuConsultasAvanzadas() {
 void generarBackupTransacciones() {
     time_t now = time(0);
     tm* ltm = localtime(&now);
-    char nombreBackup[120];
-    sprintf(nombreBackup, "transacciones_backup_%04d_%02d_%02d_%02d_%02d_%02d.txt",
+
+    // Generar nombres de backup con fecha y hora
+    char nombreBackup1[120];
+    sprintf(nombreBackup1, "transacciones1_backup_%04d_%02d_%02d_%02d_%02d_%02d.txt",
         1900 + ltm->tm_year, 1 + ltm->tm_mon, ltm->tm_mday,
         ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
-  
 
-    // Backup ahorro
-    FILE* origen = fopen("transacciones.txt", "rb");
-    if (origen) {
-        FILE* destino = fopen(nombreBackup, "wb");
-        if (destino) {
+    char nombreBackup2[120];
+    sprintf(nombreBackup2, "transacciones_backup_%04d_%02d_%02d_%02d_%02d_%02d.txt",
+        1900 + ltm->tm_year, 1 + ltm->tm_mon, ltm->tm_mday,
+        ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+
+    // Backup para transacciones1.txt
+    FILE* origen1 = fopen("transacciones1.txt", "rb");
+    if (origen1) {
+        FILE* destino1 = fopen(nombreBackup1, "wb");
+        if (destino1) {
             char buffer[4096];
             size_t bytes;
-            while ((bytes = fread(buffer, 1, sizeof(buffer), origen)) > 0) {
-                fwrite(buffer, 1, bytes, destino);
+            while ((bytes = fread(buffer, 1, sizeof(buffer), origen1)) > 0) {
+                fwrite(buffer, 1, bytes, destino1);
             }
-            fclose(destino);
-            std::cout << "Backup generado: " << nombreBackup << std::endl;
+            fclose(destino1);
+            std::cout << "Backup generado: " << nombreBackup1 << std::endl;
         } else {
-            std::cout << "No se pudo crear el archivo de backup de ahorro." << std::endl;
+            std::cout << "No se pudo crear el archivo de backup para transacciones1.txt." << std::endl;
         }
-        fclose(origen);
+        fclose(origen1);
+    } else {
+        std::cout << "No existe transacciones1.txt para respaldar." << std::endl;
+    }
+
+    // Backup para transacciones.txt
+    FILE* origen2 = fopen("transacciones.txt", "rb");
+    if (origen2) {
+        FILE* destino2 = fopen(nombreBackup2, "wb");
+        if (destino2) {
+            char buffer[4096];
+            size_t bytes;
+            while ((bytes = fread(buffer, 1, sizeof(buffer), origen2)) > 0) {
+                fwrite(buffer, 1, bytes, destino2);
+            }
+            fclose(destino2);
+            std::cout << "Backup generado: " << nombreBackup2 << std::endl;
+        } else {
+            std::cout << "No se pudo crear el archivo de backup para transacciones.txt." << std::endl;
+        }
+        fclose(origen2);
     } else {
         std::cout << "No existe transacciones.txt para respaldar." << std::endl;
     }
 }
 
 void restaurarBackupTransacciones() {
-    
-    std::vector<std::string> backups;
+    std::vector<std::string> backups1, backups2;
     DIR* dir = opendir(".");
     if (!dir) {
         std::cout << "No se pudo abrir el directorio actual." << std::endl;
@@ -641,67 +679,127 @@ void restaurarBackupTransacciones() {
     struct dirent* entry;
     while ((entry = readdir(dir)) != nullptr) {
         std::string nombre(entry->d_name);
-        if (nombre.find("transacciones_backup") == 0 && nombre.find(".txt") != std::string::npos) {
-            backups.push_back(nombre);
+        if (nombre.find("transacciones1_backup") == 0 && nombre.find(".txt") != std::string::npos) {
+            backups1.push_back(nombre);
+        } else if (nombre.find("transacciones_backup") == 0 && nombre.find(".txt") != std::string::npos) {
+            backups2.push_back(nombre);
         }
     }
     closedir(dir);
 
-    if (backups.empty()) {
+    if (backups1.empty() && backups2.empty()) {
         std::cout << "No hay backups disponibles." << std::endl;
         system("pause");
         return;
     }
 
-    int seleccion = 0;
-    while (true) {
-        system("cls");
-        std::cout << "Seleccione el backup a restaurar:" << std::endl;
-        for (size_t i = 0; i < backups.size(); ++i) {
-            if ((int)i == seleccion)
-                std::cout << ">> " << backups[i] << std::endl;
-            else
-                std::cout << "   " << backups[i] << std::endl;
+    // Restaurar transacciones1.txt
+    if (!backups1.empty()) {
+        int seleccion1 = 0;
+        while (true) {
+            system("cls");
+            std::cout << "Seleccione el backup para transacciones1.txt a restaurar:" << std::endl;
+            for (size_t i = 0; i < backups1.size(); ++i) {
+                if ((int)i == seleccion1)
+                    std::cout << ">> " << backups1[i] << std::endl;
+                else
+                    std::cout << "   " << backups1[i] << std::endl;
+            }
+
+            int tecla = _getch();
+            if (tecla == 224) {
+                tecla = _getch();
+                if (tecla == 72) { // flecha arriba
+                    if (seleccion1 > 0) seleccion1--;
+                    else seleccion1 = backups1.size() - 1;
+                } else if (tecla == 80) { // flecha abajo
+                    if (seleccion1 < (int)backups1.size() - 1) seleccion1++;
+                    else seleccion1 = 0;
+                }
+            } else if (tecla == 13) { // enter
+                FILE* origen1 = fopen(backups1[seleccion1].c_str(), "rb");
+                if (!origen1) {
+                    std::cout << "No se pudo abrir el backup seleccionado." << std::endl;
+                    system("pause");
+                    continue;
+                }
+
+                const char* destinoNombre1 = "transacciones1.txt";
+                FILE* destino1 = fopen(destinoNombre1, "wb");
+                if (!destino1) {
+                    std::cout << "No se pudo restaurar el archivo." << std::endl;
+                    fclose(origen1);
+                    system("pause");
+                    continue;
+                }
+
+                char buffer[4096];
+                size_t bytes;
+                while ((bytes = fread(buffer, 1, sizeof(buffer), origen1)) > 0) {
+                    fwrite(buffer, 1, bytes, destino1);
+                }
+
+                fclose(origen1);
+                fclose(destino1);
+                std::cout << "Backup restaurado: " << backups1[seleccion1] << " -> " << destinoNombre1 << std::endl;
+                system("pause");
+                break;
+            }
         }
+    }
 
-        int tecla = _getch();
-        if (tecla == 224) {
-            tecla = _getch();
-            if (tecla == 72) { // flecha arriba
-                if (seleccion > 0) seleccion--;
-                else seleccion = backups.size() - 1;
-            } else if (tecla == 80) { // flecha abajo
-                if (seleccion < (int)backups.size() - 1) seleccion++;
-                else seleccion = 0;
+    // Restaurar transacciones.txt
+    if (!backups2.empty()) {
+        int seleccion2 = 0;
+        while (true) {
+            system("cls");
+            std::cout << "Seleccione el backup para transacciones.txt a restaurar:" << std::endl;
+            for (size_t i = 0; i < backups2.size(); ++i) {
+                if ((int)i == seleccion2)
+                    std::cout << ">> " << backups2[i] << std::endl;
+                else
+                    std::cout << "   " << backups2[i] << std::endl;
             }
-        } else if (tecla == 13) { // enter
-            FILE* origen = fopen(backups[seleccion].c_str(), "rb");
-            if (!origen) {
-                std::cout << "No se pudo abrir el backup seleccionado." << std::endl;
+
+            int tecla = _getch();
+            if (tecla == 224) {
+                tecla = _getch();
+                if (tecla == 72) { // flecha arriba
+                    if (seleccion2 > 0) seleccion2--;
+                    else seleccion2 = backups2.size() - 1;
+                } else if (tecla == 80) { // flecha abajo
+                    if (seleccion2 < (int)backups2.size() - 1) seleccion2++;
+                    else seleccion2 = 0;
+                }
+            } else if (tecla == 13) { // enter
+                FILE* origen2 = fopen(backups2[seleccion2].c_str(), "rb");
+                if (!origen2) {
+                    std::cout << "No se pudo abrir el backup seleccionado." << std::endl;
+                    system("pause");
+                    continue;
+                }
+
+                const char* destinoNombre2 = "transacciones.txt";
+                FILE* destino2 = fopen(destinoNombre2, "wb");
+                if (!destino2) {
+                    std::cout << "No se pudo restaurar el archivo." << std::endl;
+                    fclose(origen2);
+                    system("pause");
+                    continue;
+                }
+
+                char buffer[4096];
+                size_t bytes;
+                while ((bytes = fread(buffer, 1, sizeof(buffer), origen2)) > 0) {
+                    fwrite(buffer, 1, bytes, destino2);
+                }
+
+                fclose(origen2);
+                fclose(destino2);
+                std::cout << "Backup restaurado: " << backups2[seleccion2] << " -> " << destinoNombre2 << std::endl;
                 system("pause");
-                continue;
+                break;
             }
-
-            const char* destinoNombre = "transacciones.txt";
-            FILE* destino = fopen(destinoNombre, "wb");
-            if (!destino) {
-                std::cout << "No se pudo restaurar el archivo." << std::endl;
-                fclose(origen);
-                system("pause");
-                continue;
-            }
-
-            char buffer[4096];
-            size_t bytes;
-            while ((bytes = fread(buffer, 1, sizeof(buffer), origen)) > 0) {
-                fwrite(buffer, 1, bytes, destino);
-            }
-
-            fclose(origen);
-            fclose(destino);
-            std::cout << "Backup restaurado: " << backups[seleccion] << " -> " << destinoNombre << std::endl;
-            system("pause");
-            break;
         }
     }
 }
@@ -792,7 +890,14 @@ int main() {
     listaCuentas.cargarCuentasDesdeArchivo("cuentas.txt");
     listaTransacciones.cargarTransaccionesDesdeArchivo("transacciones.txt"); // Inicializa
     
-
+    // Verificar si hay cuentas y establecer el contador adecuadamente
+    if (!listaCuentas.getNodoCabeza()) {
+        contadorId = 1; // Reiniciar el contador si no hay cuentas
+        guardarUltimoIdCuenta(0);
+    } else {
+        contadorId = leerUltimoIdCuenta() + 1;
+    }
+    
     int opcion = 0;
     bool salir = false;
     while (!salir) {
@@ -840,13 +945,11 @@ int main() {
 
                     string contrasena;
                     if (cuentaExistente) {
-                        contadorId = leerUltimoIdCuenta() + 1;
                         nombre = cuentaExistente->getNombre();
                         apellido = cuentaExistente->getApellido();
                         contrasena = cuentaExistente->getContrasena();
                         cout << "Usuario ya registrado. Se usaran los datos existentes." << endl;
                     } else {
-                        contadorId = leerUltimoIdCuenta() + 1;
                         nombre = Validar::pedirNombre();
                         apellido = Validar::pedirApellido();
                         contrasena = ContrasenaUsuario::generarContrasenaBancaria();
@@ -861,6 +964,7 @@ int main() {
                     guardarUltimoIdCuenta(contadorId - 1);
 
                     cout << "Cuenta creada exitosamente con ID: " << cuenta.getIdCuentaStr() << endl;
+                    cout << "Numero de cuenta bancario completo: " << cuenta.getNumeroCuentaCompleto() << endl;
                     cout << "Su contrasena bancaria es: " << contrasena << endl;
 
                     system("pause");

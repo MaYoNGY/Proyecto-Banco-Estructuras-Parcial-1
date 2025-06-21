@@ -29,13 +29,16 @@ bool OperacionCuenta::depositar(double monto) {
     double saldo = cuenta.getSaldo();
     if (saldo < 0) {
         // Hay sobregiro, primero paga el sobregiro
-        double montoSobregiro = -saldo;
-        if (monto >= montoSobregiro) {
-            cuenta.setSaldo(0.0 + (monto - montoSobregiro)); // Sobra después de pagar sobregiro
-            fechaInicioSobregiro = 0;
+        double montoSobregiroPendiente = -saldo; // El saldo negativo es el sobregiro actual
+        if (monto >= montoSobregiroPendiente) {
+            cuenta.setSaldo(monto - montoSobregiroPendiente); // Sobra después de pagar sobregiro
+            tieneSobregiro = false; // Sobregiro pagado
+            montoSobregiro = 0; // Reinicia el monto del sobregiro
+            fechaInicioSobregiro = 0; // Reinicia la fecha del sobregiro
             std::cout << "Sobregiro pagado en su totalidad. Nuevo saldo: $" << cuenta.getSaldo() << "\n";
         } else {
             cuenta.setSaldo(saldo + monto); // Sigue en sobregiro
+            montoSobregiro -= monto; // Reduce el monto pendiente del sobregiro
             std::cout << "Pago parcial de sobregiro realizado. Queda pendiente: $" << -cuenta.getSaldo() << "\n";
         }
     } else {

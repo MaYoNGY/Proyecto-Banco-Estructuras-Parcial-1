@@ -11,6 +11,7 @@ class Cuenta
 {
 private:
    std::string idCuenta; 
+   std::string numeroCuentaCompleto; // Nuevo campo para el número completo con formato bancario
    Persona persona;
    double saldo;
    TipoCuenta tipo;
@@ -21,6 +22,10 @@ private:
 public:
    std::string getIdCuentaStr(void) const;
    void generarIdCuenta();
+   
+   // Nuevos métodos para el número de cuenta completo
+   std::string getNumeroCuentaCompleto() const;
+   void setNumeroCuentaCompleto(const std::string& numero);
 
    std::string getNombre(void) const;
    void setNombre(std::string newNombre);
