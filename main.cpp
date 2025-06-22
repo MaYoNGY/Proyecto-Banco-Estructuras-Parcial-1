@@ -13,6 +13,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <iomanip>
 #include "Validar.cpp"
@@ -668,6 +669,10 @@ void generarBackupTransacciones() {
     }
 }
 
+void abrirAyuda() {
+                    system("\"C:\\Users\\camev\\Desktop\\Proyecto-Banco-Estructuras-Parcial-FINAL\\Proyecto-Banco-Estructuras-Parcial-1\\abrirAyuda.exe\"");
+                }
+
 void restaurarBackupTransacciones() {
     std::vector<std::string> backups1, backups2;
     DIR* dir = opendir(".");
@@ -1084,7 +1089,7 @@ int main() {
                     menuOrdenarCuentas();
                     break;
                 case 9: // Ayuda
-                    VentanaAyuda::Crear(GetModuleHandle(NULL));
+                    abrirAyuda();
                     break;
                 case 10: { // Pico de acceso de usuario
                     system("cls");
