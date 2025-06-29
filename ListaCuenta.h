@@ -5,6 +5,7 @@
 #include "NodoCuenta.h"
 #include <fstream>
 #include <sstream>
+#include <vector>
 #include <algorithm>
 #include "Cuenta.h"
 #include "Persona.h"
@@ -66,12 +67,18 @@ public:
       }
       NodoCuenta<T>* actual = cabeza;
       do {
+        Fecha fecha = actual->getDato().getFechaCreacion();  
         std::cout << "ID: " << actual->getDato().getIdCuenta()
                   << ", Cedula: " << actual->getDato().getCedula()
                   << ", Nombre: " << actual->getDato().getNombre()
                   << ", Apellido: " << actual->getDato().getApellido()
                   << ", Saldo: " << actual->getDato().getSaldo()
                   << ", Tipo: " << actual->getDato().getTipo().getTipo()
+                  << ", Fecha de Creacion: "
+                  << fecha.getDia() << "/" << fecha.getMes() << "/" << fecha.getAnio()
+                  << " " << fecha.getHora() << ":" << fecha.getMinutos() << ":" << fecha.getSegundos()
+                  << ", Sucursal: " << actual->getDato().getSucursal().getNombre() // <-- Usa el objeto
+                  << ", Codigo Sucursal: " << actual->getDato().getSucursal().getCodigo()
                   << std::endl;
         actual = actual->getSiguiente();
     } while (actual != cabeza);
@@ -94,6 +101,8 @@ void mostrarCuentasConFecha() const {
                   << ", Fecha de Creacion: "
                   << fecha.getDia() << "/" << fecha.getMes() << "/" << fecha.getAnio()
                   << " " << fecha.getHora() << ":" << fecha.getMinutos() << ":" << fecha.getSegundos()
+                  << ", Sucursal: " << actual->getDato().getSucursal().getNombre() // <-- Usa el objeto
+                  << ", Codigo Sucursal: " << actual->getDato().getSucursal().getCodigo()
                   << std::endl;
         actual = actual->getSiguiente();
     } while (actual != cabeza);
@@ -232,13 +241,16 @@ void guardarCuentasEnArchivo(const std::string& nombreArchivo) {
                 << actual->getDato().getApellido() << " "
                 << actual->getDato().getTipo().getTipo() << " "
                 << actual->getDato().getContrasena() << " "
-                << actual->getDato().getSaldo() << " " // <-- saldo actual
+                << actual->getDato().getSaldo() << " "
                 << actual->getDato().getFechaCreacion().getDia() << " "
                 << actual->getDato().getFechaCreacion().getMes() << " "
                 << actual->getDato().getFechaCreacion().getAnio() << " "
                 << actual->getDato().getFechaCreacion().getHora() << " "
                 << actual->getDato().getFechaCreacion().getMinutos() << " "
-                << actual->getDato().getFechaCreacion().getSegundos()
+                << actual->getDato().getFechaCreacion().getSegundos() << " "
+                << actual->getDato().getNumeroCuentaCompleto() << " " // <-- Añade esta línea
+                << actual->getDato().getSucursal().getNombre() << " "
+                << actual->getDato().getSucursal().getCodigo()
                 << std::endl;
         actual = actual->getSiguiente();
     } while (actual != cabeza);
@@ -272,14 +284,14 @@ void guardarCuentasEnArchivo(const std::string& nombreArchivo) {
   while (std::getline(archivo, linea)) {
     if (linea.empty()) continue;
     std::istringstream iss(linea);
-    std::string idCuenta, cedula, nombre, apellido, tipo, contrasena;
+    std::string idCuenta, cedula, nombre, apellido, tipo, contrasena, numeroCuentaCompleto, sucursalNombre, codigoSucursal;
     double saldo;
     int dia, mes, anio, hora, minutos, segundos;
 
     // Lee los campos en el mismo orden en que se guardaron
     if (!(iss >> idCuenta >> cedula >> nombre >> apellido >> tipo 
           >> contrasena >> saldo >> dia >> mes >> anio 
-          >> hora >> minutos >> segundos)) {
+          >> hora >> minutos >> segundos >> numeroCuentaCompleto >> sucursalNombre >> codigoSucursal)) {
         std::cerr << "Error de formato en la línea: " << linea << std::endl;
         continue;
     }
@@ -298,11 +310,11 @@ void guardarCuentasEnArchivo(const std::string& nombreArchivo) {
 
     TipoCuenta tipoCuenta(tipo);
     Persona persona(cedula, nombre, apellido);
-    Cuenta cuenta(idCuenta, persona, saldo, tipoCuenta, contrasena, fechaCreacion);
-    
-    
+    Sucursal sucursal(sucursalNombre, "", codigoSucursal); // Usa el objeto Sucursal
+    Cuenta cuenta(idCuenta, persona, saldo, tipoCuenta, contrasena, fechaCreacion, sucursal); // Pasa el objeto Sucursal
+    cuenta.setNumeroCuentaCompleto(numeroCuentaCompleto); // <-- Asigna el número de cuenta completo
     insertarCuenta(cuenta);
-  }
+}
   archivo.close();
 }
 
@@ -314,6 +326,7 @@ void buscarCuentasPorNombre(const std::string& nombreCompleto) const {
     NodoCuenta<T>* actual = cabeza;
     bool encontrada = false;
     do {
+        Fecha fecha = actual->getDato().getFechaCreacion();
         std::string nombreCuenta = actual->getDato().getNombre() + " " + actual->getDato().getApellido();
         if (nombreCuenta == nombreCompleto) {
             std::cout << "ID: " << actual->getDato().getIdCuenta()
@@ -322,6 +335,10 @@ void buscarCuentasPorNombre(const std::string& nombreCompleto) const {
                     << ", Apellido: " << actual->getDato().getApellido()
                     << ", Saldo: " << actual->getDato().getSaldo()
                     << ", Tipo: " << actual->getDato().getTipo().getTipo()
+                    << ", Fecha de Creacion: " << fecha.getDia() << "/" << fecha.getMes() << "/" << fecha.getAnio()
+                    << " " << fecha.getHora() << ":" << fecha.getMinutos() << ":" << fecha.getSegundos()
+                    << ", Sucursal: " << actual->getDato().getSucursal().getNombre() // <-- Usa el objeto
+                    << ", Codigo Sucursal: " << actual->getDato().getSucursal().getCodigo()
                     << std::endl;
             encontrada = true;
         }
@@ -354,6 +371,7 @@ void buscarCuentasPorCedula(const std::string& cedula) const {
     NodoCuenta<Cuenta>* actual = cabeza;
     bool encontradas = false;
     do {
+        Fecha fecha = actual->getDato().getFechaCreacion();
         if (actual->getDato().getCedula() == cedula) {
             std::cout << "ID: " << actual->getDato().getIdCuenta()
                       << ", Cedula: " << actual->getDato().getCedula()
@@ -361,6 +379,10 @@ void buscarCuentasPorCedula(const std::string& cedula) const {
                       << ", Apellido: " << actual->getDato().getApellido()
                       << ", Saldo: " << actual->getDato().getSaldo()
                       << ", Tipo: " << actual->getDato().getTipo().getTipo()
+                      << ", Fecha de Creacion: " << fecha.getDia() << "/" << fecha.getMes() << "/" << fecha.getAnio()
+                      << " " << fecha.getHora() << ":" << fecha.getMinutos() << ":" << fecha.getSegundos()
+                      << ", Sucursal: " << actual->getDato().getSucursal().getNombre() // <-- Usa el objeto
+                      << ", Codigo Sucursal: " << actual->getDato().getSucursal().getCodigo()
                       << std::endl;
             encontradas = true;
         }
@@ -380,6 +402,7 @@ void mostrarCuentaPorId(const std::string& id) const {
     NodoCuenta<T>* actual = cabeza; // Usa T, no Cuenta
     bool encontrada = false;
     do {
+        Fecha fecha = actual->getDato().getFechaCreacion();
         if (actual->getDato().getIdCuenta() == id) {
             const T& cuenta = actual->getDato();
             std::cout << "ID: " << cuenta.getIdCuenta()
@@ -388,6 +411,10 @@ void mostrarCuentaPorId(const std::string& id) const {
                     << ", Apellido: " << cuenta.getApellido()
                     << ", Saldo: " << cuenta.getSaldo()
                     << ", Tipo: " << cuenta.getTipo().getTipo()
+                    << ", Fecha de Creacion: " << fecha.getDia() << "/" << fecha.getMes() << "/" << fecha.getAnio()
+                    << " " << fecha.getHora() << ":" << fecha.getMinutos() << ":" << fecha.getSegundos()
+                    << ", Sucursal: " << cuenta.getSucursal().getNombre() // <-- Usa el objeto
+                    << ", Codigo Sucursal: " << cuenta.getSucursal().getCodigo()
                     << std::endl;
             encontrada = true;
             break;
@@ -407,6 +434,7 @@ void buscarCuentasPorDato(const std::string& valor) const {
     NodoCuenta<T>* actual = cabeza;
     bool encontrada = false;
     do {
+        Fecha fecha = actual->getDato().getFechaCreacion();
         const T& cuenta = actual->getDato();
         if (cuenta.getNombre() == valor ||
             cuenta.getApellido() == valor ||
@@ -419,6 +447,10 @@ void buscarCuentasPorDato(const std::string& valor) const {
                       << ", Apellido: " << cuenta.getApellido()
                       << ", Saldo: " << cuenta.getSaldo()
                       << ", Tipo: " << cuenta.getTipo().getTipo()
+                      << ", Fecha de Creacion: " << fecha.getDia() << "/" << fecha.getMes() << "/" << fecha.getAnio()
+                      << " " << fecha.getHora() << ":" << fecha.getMinutos() << ":" << fecha.getSegundos()
+                      << ", Sucursal: " << cuenta.getSucursal().getNombre() // <-- Usa el objeto
+                      << ", Codigo Sucursal: " << cuenta.getSucursal().getCodigo()
                       << std::endl;
             encontrada = true;
         }
@@ -504,6 +536,135 @@ void buscarCuentasPorDato(const std::string& valor) const {
 
         actual = actual->getSiguiente();
     } while (actual != cabeza);
+}
+
+void buscarCuentasPorSucursal(const std::string& sucursal) const {
+    NodoCuenta<T>* actual = cabeza;
+    bool encontrada = false;
+    if (!actual) {
+        std::cout << "No hay cuentas registradas." << std::endl;
+        return;
+    }
+    do {
+        if (actual->getDato().getSucursal().getNombre() == sucursal) { // <-- Usa el objeto Sucursal
+            encontrada = true;
+            Fecha fecha = actual->getDato().getFechaCreacion();
+            std::cout << "ID: " << actual->getDato().getIdCuenta()
+                      << ", Cedula: " << actual->getDato().getCedula()
+                      << ", Nombre: " << actual->getDato().getNombre()
+                      << ", Apellido: " << actual->getDato().getApellido()
+                      << ", Saldo: " << actual->getDato().getSaldo()
+                      << ", Tipo: " << actual->getDato().getTipo().getTipo()
+                      << ", Fecha de Creacion: " << fecha.getDia() << "/" << fecha.getMes() << "/" << fecha.getAnio()
+                      << " " << fecha.getHora() << ":" << fecha.getMinutos() << ":" << fecha.getSegundos()
+                      << ", Sucursal: " << actual->getDato().getSucursal().getNombre() // <-- Usa el objeto
+                      << ", Codigo Sucursal: " << actual->getDato().getSucursal().getCodigo()
+                      << std::endl;
+        }
+        actual = actual->getSiguiente();
+    } while (actual != cabeza);
+    if (!encontrada) {
+        std::cout << "No hay cuentas en esa sucursal." << std::endl;
+    }
+}
+
+void buscarCuentasPorFechaYSucursal(int dia, int mes, int anio, const std::string& nombreSucursal) const {
+    if (!cabeza) {
+        std::cout << "No hay cuentas en la lista." << std::endl;
+        return;
+    }
+    // 1. Copia a vector
+    std::vector<Cuenta> cuentasVec;
+    NodoCuenta<T>* actual = cabeza;
+    do {
+        cuentasVec.push_back(actual->getDato());
+        actual = actual->getSiguiente();
+    } while (actual != cabeza);
+
+    // 2. Ordena por fecha y sucursal usando selection sort
+    for (size_t i = 0; i < cuentasVec.size(); ++i) {
+        size_t minIdx = i;
+        for (size_t j = i + 1; j < cuentasVec.size(); ++j) {
+            Fecha fa = cuentasVec[j].getFechaCreacion();
+            Fecha fb = cuentasVec[minIdx].getFechaCreacion();
+            if (fa.getAnio() < fb.getAnio() ||
+                (fa.getAnio() == fb.getAnio() && fa.getMes() < fb.getMes()) ||
+                (fa.getAnio() == fb.getAnio() && fa.getMes() == fb.getMes() && fa.getDia() < fb.getDia()) ||
+                (fa.getAnio() == fb.getAnio() && fa.getMes() == fb.getMes() && fa.getDia() == fb.getDia() &&
+                 cuentasVec[j].getSucursal().getNombre() < cuentasVec[minIdx].getSucursal().getNombre())) {
+                minIdx = j;
+            }
+        }
+        if (minIdx != i) {
+            std::swap(cuentasVec[i], cuentasVec[minIdx]);
+        }
+    }
+
+    // 3. Objeto clave
+    Fecha fechaClave; fechaClave.setDia(dia); fechaClave.setMes(mes); fechaClave.setAnio(anio);
+    Sucursal sucursalClave(nombreSucursal);
+    Cuenta cuentaClave(Persona(), 0, TipoCuenta(), sucursalClave);
+    cuentaClave.setFechaCreacion(fechaClave);
+
+    // Comparador igual al usado en el sort
+    auto comparar = [](const Cuenta& a, const Cuenta& b) {
+        Fecha fa = a.getFechaCreacion();
+        Fecha fb = b.getFechaCreacion();
+        if (fa.getAnio() != fb.getAnio()) return fa.getAnio() < fb.getAnio();
+        if (fa.getMes() != fb.getMes()) return fa.getMes() < fb.getMes();
+        if (fa.getDia() != fb.getDia()) return fa.getDia() < fb.getDia();
+        return a.getSucursal().getNombre() < b.getSucursal().getNombre();
+    };
+
+    // 4. Búsqueda binaria manual para encontrar la primera coincidencia
+    int left = 0, right = cuentasVec.size() - 1;
+    int foundIdx = -1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        const Cuenta& midCuenta = cuentasVec[mid];
+        Fecha f = midCuenta.getFechaCreacion();
+        std::string suc = midCuenta.getSucursal().getNombre();
+
+        // Compara fecha y sucursal
+        if (f.getAnio() == anio && f.getMes() == mes && f.getDia() == dia && suc == nombreSucursal) {
+            foundIdx = mid;
+            // Busca si hay más a la izquierda (primer match)
+            right = mid - 1;
+        } else if (comparar(midCuenta, cuentaClave)) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+
+    // 5. Si se encontró, muestra todas las coincidencias hacia adelante
+    bool encontrada = false;
+    if (foundIdx != -1) {
+        // Avanza desde foundIdx mientras siga habiendo coincidencias
+        for (size_t i = foundIdx; i < cuentasVec.size(); ++i) {
+            Fecha f = cuentasVec[i].getFechaCreacion();
+            if (f.getDia() == dia && f.getMes() == mes && f.getAnio() == anio &&
+                cuentasVec[i].getSucursal().getNombre() == nombreSucursal) {
+                std::cout << "ID: " << cuentasVec[i].getIdCuenta()
+                          << ", Cedula: " << cuentasVec[i].getCedula()
+                          << ", Nombre: " << cuentasVec[i].getNombre()
+                          << ", Apellido: " << cuentasVec[i].getApellido()
+                          << ", Saldo: " << cuentasVec[i].getSaldo()
+                          << ", Tipo: " << cuentasVec[i].getTipo().getTipo()
+                          << ", Fecha de Creacion: " << f.getDia() << "/" << f.getMes() << "/" << f.getAnio()
+                          << " " << f.getHora() << ":" << f.getMinutos() << ":" << f.getSegundos()
+                          << ", Sucursal: " << cuentasVec[i].getSucursal().getNombre()
+                          << ", Codigo Sucursal: " << cuentasVec[i].getSucursal().getCodigo()
+                          << std::endl;
+                encontrada = true;
+            } else {
+                break;
+            }
+        }
+    }
+    if (!encontrada) {
+        std::cout << "No se encontraron cuentas abiertas en esa fecha y sucursal." << std::endl;
+    }
 }
 
 };

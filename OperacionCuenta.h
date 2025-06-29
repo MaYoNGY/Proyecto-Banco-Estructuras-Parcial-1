@@ -8,8 +8,6 @@
 class OperacionCuenta {
 private:
     Cuenta& cuenta;
-    bool tieneSobregiro;
-    double montoSobregiro;
     std::time_t fechaInicioSobregiro;
 
     // Para control de sobregiros mensuales
@@ -19,6 +17,7 @@ private:
 
 public:
     OperacionCuenta(Cuenta& c);
+    void setFechaInicioSobregiro(std::time_t fecha) { fechaInicioSobregiro = fecha; }
 
     // Métodos normales
     bool depositar(double monto);

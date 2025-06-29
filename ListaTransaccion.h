@@ -21,6 +21,7 @@ private:
    
 public:
    ListaTransaccion() : cabeza(nullptr), cola(nullptr) {}
+   NodoTransaccion<T>* getNodoCabeza() const { return cabeza; }
 
    ~ListaTransaccion() {
       NodoTransaccion<T>* actual = cabeza;
@@ -229,6 +230,7 @@ public:
            auto fecha = trans.getFecha();
            archivo << cuenta.getIdCuenta() << " "
                    << cuenta.getNombre() << " "
+                   << cuenta.getApellido() << " "
                    << cuenta.getCedula() << " "
                    << tipoCuenta.getTipo() << " "
                    << cuenta.getSaldo() << " "
@@ -239,7 +241,9 @@ public:
                    << fecha.getAnio() << " "
                    << fecha.getHora() << " "
                    << fecha.getMinutos() << " "
-                   << fecha.getSegundos()
+                   << fecha.getSegundos() << " "
+                   << cuenta.getSucursal().getNombre() << " "      // Guarda el nombre de la sucursal
+                   << cuenta.getSucursal().getCodigo()             // Guarda el código de la sucursal
                    << std::endl;
            actual = actual->getSiguiente();
        } while (actual != cabeza);
@@ -273,12 +277,13 @@ public:
         if (linea.empty()) continue;
 
         std::istringstream iss(linea);
-        std::string idCuenta, nombre, cedula, tipoCuenta, tipoTransaccion;
+        std::string idCuenta, nombre, apellido, cedula, tipoCuenta, tipoTransaccion, sucursalNombre, codigoSucursal;
         double saldo, monto;
         int dia, mes, anio, hora, minutos, segundos;
 
-        // Leer todos los datos, incluyendo la hora
-        if (!(iss >> idCuenta >> nombre >> cedula >> tipoCuenta >> saldo >> tipoTransaccion >> monto >> dia >> mes >> anio >> hora >> minutos >> segundos)) {
+        // Leer todos los datos, incluyendo el código de sucursal
+        if (!(iss >> idCuenta >> nombre >> apellido >> cedula >> tipoCuenta >> saldo >> tipoTransaccion >> monto
+          >> dia >> mes >> anio >> hora >> minutos >> segundos >> sucursalNombre >> codigoSucursal)) {
             std::cerr << "Error de formato en la línea: " << linea << std::endl;
             continue;
         }
@@ -293,12 +298,13 @@ public:
         fecha.setSegundos(segundos);
 
         TipoCuenta tipoCuentaObj(tipoCuenta);
-        Persona persona(cedula, nombre, ""); // Apellido vacío si no lo guardas
-        Cuenta cuenta(idCuenta, persona, saldo, tipoCuentaObj, "", fecha);
+        Persona persona(cedula, nombre, apellido);
+        Sucursal sucursal(sucursalNombre, "", codigoSucursal); // Usa el objeto Sucursal
+        Cuenta cuenta(idCuenta, persona, saldo, tipoCuentaObj, "", fecha, sucursal); // Pasa el objeto Sucursal
         TipoTransaccion tipoTrans(tipoTransaccion);
 
         T transaccion(cuenta, tipoTrans, monto, fecha);
-        insertarTransaccion(transaccion); // Insertar la transacción en la lista
+        insertarTransaccion(transaccion);
     }
     archivo.close();
 }

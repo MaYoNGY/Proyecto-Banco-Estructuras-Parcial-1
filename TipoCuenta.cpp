@@ -1,9 +1,8 @@
 #include "TipoCuenta.h"
 
-TipoCuenta::TipoCuenta(const std::string& tipo)
-{
-    this->tipo = tipo; // Asume que tipo es "ahorro" o "corriente"
-}
+TipoCuenta::TipoCuenta() : tipo("") {} // Implementación del constructor por defecto
+
+TipoCuenta::TipoCuenta(const std::string& t) : tipo(t) {}
 
 TipoCuenta::~TipoCuenta() {}
 

@@ -57,3 +57,33 @@ void Fecha::mostrarFechaHora() const {
               << hora << ":" << minutos << ":" << segundos;
 }
 
+void Fecha::sumarMinutos(int min) {
+    std::tm tmFecha = {};
+    tmFecha.tm_mday = dia;
+    tmFecha.tm_mon = mes - 1;
+    tmFecha.tm_year = anio - 1900;
+    tmFecha.tm_hour = hora;
+    tmFecha.tm_min = minutos;
+    tmFecha.tm_sec = segundos;
+    std::time_t t = std::mktime(&tmFecha);
+    t += min * 60;
+    tmFecha = *std::localtime(&t);
+    dia = tmFecha.tm_mday;
+    mes = tmFecha.tm_mon + 1;
+    anio = tmFecha.tm_year + 1900;
+    hora = tmFecha.tm_hour;
+    minutos = tmFecha.tm_min;
+    segundos = tmFecha.tm_sec;
+}
+
+int Fecha::diferenciaEnMinutos(const Fecha& otra) const {
+    std::tm tm1 = {}, tm2 = {};
+    tm1.tm_mday = dia; tm1.tm_mon = mes - 1; tm1.tm_year = anio - 1900;
+    tm1.tm_hour = hora; tm1.tm_min = minutos; tm1.tm_sec = segundos;
+    tm2.tm_mday = otra.dia; tm2.tm_mon = otra.mes - 1; tm2.tm_year = otra.anio - 1900;
+    tm2.tm_hour = otra.hora; tm2.tm_min = otra.minutos; tm2.tm_sec = otra.segundos;
+    std::time_t t1 = std::mktime(&tm1);
+    std::time_t t2 = std::mktime(&tm2);
+    return static_cast<int>(std::difftime(t1, t2) / 60);
+}
+

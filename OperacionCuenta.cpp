@@ -4,12 +4,12 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
+#include <algorithm>
 
-// Agrega variables para control de sobregiros mensuales
 static const int LIMITE_SOBREGIROS_MES = 3;
 
 OperacionCuenta::OperacionCuenta(Cuenta& c) 
-    : cuenta(c), tieneSobregiro(false), montoSobregiro(0), fechaInicioSobregiro(0),
+    : cuenta(c), fechaInicioSobregiro(0),
       sobregirosEsteMes(0), mesUltimoSobregiro(-1), anioUltimoSobregiro(-1) {}
 
 bool OperacionCuenta::validarMonto(double monto) {
@@ -28,17 +28,12 @@ bool OperacionCuenta::depositar(double monto) {
 
     double saldo = cuenta.getSaldo();
     if (saldo < 0) {
-        // Hay sobregiro, primero paga el sobregiro
-        double montoSobregiroPendiente = -saldo; // El saldo negativo es el sobregiro actual
+        double montoSobregiroPendiente = -saldo;
         if (monto >= montoSobregiroPendiente) {
-            cuenta.setSaldo(monto - montoSobregiroPendiente); // Sobra después de pagar sobregiro
-            tieneSobregiro = false; // Sobregiro pagado
-            montoSobregiro = 0; // Reinicia el monto del sobregiro
-            fechaInicioSobregiro = 0; // Reinicia la fecha del sobregiro
+            cuenta.setSaldo(monto - montoSobregiroPendiente);
             std::cout << "Sobregiro pagado en su totalidad. Nuevo saldo: $" << cuenta.getSaldo() << "\n";
         } else {
-            cuenta.setSaldo(saldo + monto); // Sigue en sobregiro
-            montoSobregiro -= monto; // Reduce el monto pendiente del sobregiro
+            cuenta.setSaldo(saldo + monto);
             std::cout << "Pago parcial de sobregiro realizado. Queda pendiente: $" << -cuenta.getSaldo() << "\n";
         }
     } else {
@@ -59,7 +54,6 @@ bool OperacionCuenta::retirar(double monto) {
     }
 
     if (cuenta.getTipo().esAhorro()) {
-        // El menú ya valida el saldo, pero aquí solo debe permitir si saldo suficiente
         if (cuenta.getSaldo() >= monto) {
             cuenta.setSaldo(cuenta.getSaldo() - monto);
             std::cout << "Retiro exitoso. Nuevo saldo: $" << cuenta.getSaldo() << "\n";
@@ -76,7 +70,7 @@ bool OperacionCuenta::retirar(double monto) {
             return true;
         } else {
             double sobregiroPermitido = 500;
-            double montoDisponible = cuenta.getSaldo() + (tieneSobregiro ? (sobregiroPermitido - montoSobregiro) : sobregiroPermitido);
+            double montoDisponible = cuenta.getSaldo() + sobregiroPermitido;
 
             // Control de límite mensual antes de ofrecer sobregiro
             std::time_t ahora = std::time(nullptr);
@@ -118,7 +112,6 @@ bool OperacionCuenta::retirar(double monto) {
     return false;
 }
 
-// Nueva función para retiro simple en cuenta de ahorro
 bool OperacionCuenta::retirarAhorroSimple(double monto) {
     double tolerancia = 0.01;
     if (monto <= 0) {
@@ -139,7 +132,7 @@ bool OperacionCuenta::retirarAhorroSimple(double monto) {
     }
 }
 
-void OperacionCuenta::iniciarSobregiro(double monto) {
+void OperacionCuenta::iniciarSobregiro(double /*monto*/) {
     // Control de límite mensual
     std::time_t ahora = std::time(nullptr);
     std::tm* fecha = std::localtime(&ahora);
@@ -157,8 +150,6 @@ void OperacionCuenta::iniciarSobregiro(double monto) {
         return;
     }
 
-    tieneSobregiro = true;
-    montoSobregiro += monto;
     fechaInicioSobregiro = ahora;
     sobregirosEsteMes++;
 }
@@ -199,20 +190,27 @@ std::ostream& operator<<(std::ostream& os, const OperacionCuenta& op) {
     os << "Cuenta ID: " << op.cuenta.getIdCuentaStr()
        << ", Tipo: " << op.cuenta.getTipo().getTipo()
        << ", Saldo: $" << op.cuenta.getSaldo();
-    if (op.tieneSobregiro) {
-        os << ", Sobregiro pendiente: $" << op.montoSobregiro;
+    if (op.cuenta.getSaldo() < 0) {
+        os << ", Sobregiro pendiente: $" << -op.cuenta.getSaldo();
     }
     return os;
 }
 
 void OperacionCuenta::calcularInteresSobregiro() {
     double saldo = cuenta.getSaldo();
-    if (saldo >= 0) return; // Solo calcula si hay sobregiro
+    if (saldo >= 0) return;
 
     std::time_t ahora = std::time(nullptr);
-    int diasPasados = static_cast<int>(std::difftime(ahora, fechaInicioSobregiro) / (60 * 60 * 24));
 
-    double montoSobregiro = -saldo; // El saldo negativo es el sobregiro
+    if (fechaInicioSobregiro <= 0) {
+        std::cout << "No se puede calcular interes: fecha de inicio de sobregiro desconocida.\n";
+        return;
+    }
+
+    int diasPasados = static_cast<int>(std::difftime(ahora, fechaInicioSobregiro) / (60 * 60 * 24));
+    if (diasPasados < 0) diasPasados = 0;
+
+    double montoSobregiro = -saldo;
     double interes = 0.0;
     if (diasPasados <= 5) {
         interes = montoSobregiro * 0.0005 * diasPasados; 
@@ -235,8 +233,8 @@ void OperacionCuenta::aplicarInteresAhorros() {
 }
 
 void OperacionCuenta::mostrarEstadoSobregiro() const {
-    if (tieneSobregiro) {
-        std::cout << "Actualmente tiene sobregiro por $" << montoSobregiro << ". Debe pagar en maximo 5 dias para evitar intereses de mora.\n";
+    if (cuenta.getSaldo() < 0) {
+        std::cout << "Actualmente tiene sobregiro por $" << -cuenta.getSaldo() << ". Debe pagar en maximo 5 dias para evitar intereses de mora.\n";
     } else {
         std::cout << "No tiene sobregiro activo.\n";
     }
@@ -248,25 +246,18 @@ void OperacionCuenta::pagarSobregiro(double monto) {
         std::cout << "No tiene sobregiro activo.\n";
         return;
     }
-    double montoSobregiro = -saldo; // Sobregiro actual (positivo)
+    double montoSobregiro = -saldo;
     double tolerancia = 0.01;
 
-    // Solo puede pagar si tiene suficiente dinero depositado (saldo positivo)
     if (monto > montoSobregiro + tolerancia) {
         std::cout << "No puede pagar mas del monto pendiente de sobregiro. Pendiente: $" << montoSobregiro << "\n";
         return;
     }
-    if (monto > (saldo + montoSobregiro + tolerancia)) { // saldo + montoSobregiro == 0 si no ha depositado nada
-        std::cout << "Saldo insuficiente en la cuenta para pagar el sobregiro. Saldo actual: $" << cuenta.getSaldo() << "\n";
-        return;
-    }
-
     cuenta.setSaldo(saldo + monto);
 
     if (cuenta.getSaldo() >= -tolerancia) {
         std::cout << "Sobregiro pagado en su totalidad.\n";
         cuenta.setSaldo(std::max(0.0, cuenta.getSaldo()));
-        fechaInicioSobregiro = 0;
     } else {
         double pendiente = -cuenta.getSaldo();
         std::cout << "Pago parcial de sobregiro realizado. Queda pendiente: $" << pendiente << "\n";

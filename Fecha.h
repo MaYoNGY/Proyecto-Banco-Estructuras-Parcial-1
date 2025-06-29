@@ -31,6 +31,22 @@ public:
     bool diaLaboral(int dia, int mes, int anio);
     bool feriado(int dia, int mes, int anio);
     void mostrarFechaHora() const;
+
+    // Operador <
+    bool operator<(const Fecha& other) const {
+        if (anio != other.anio) return anio < other.anio;
+        if (mes != other.mes) return mes < other.mes;
+        if (dia != other.dia) return dia < other.dia;
+        if (hora != other.hora) return hora < other.hora;
+        if (minutos != other.minutos) return minutos < other.minutos;
+        return segundos < other.segundos;
+    }
+
+    // Suma minutos a la fecha/hora
+    void sumarMinutos(int min);
+
+    // Diferencia en minutos entre dos fechas
+    int diferenciaEnMinutos(const Fecha& otra) const;
 };
 
 #endif

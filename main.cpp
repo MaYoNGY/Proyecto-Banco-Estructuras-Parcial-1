@@ -33,13 +33,30 @@
 #include "AccesoUsuario.h" // Incluye la clase de acceso de usuario
 #include "TransaccionesUsuario.h"
 #include "SimuladorSobregiro.h"
+#include "Sucursal.h" // Incluye la clase Sucursal
+#include "Cita.h"
+#include "Cita.cpp"
+#include <fstream>
+#include <string>
+#include <cstdlib>
+#include <map>
+#include <algorithm>
+
 
 using namespace std;
 
 ListaCuenta<Cuenta> listaCuentas;
 ListaTransaccion<Transaccion> listaTransacciones;
+std::map<std::string, std::vector<Cita>> citasPorSucursal;
 
 unsigned long long contadorId = 1;
+
+std::vector<Sucursal> sucursales = {
+    Sucursal("Quito", "Av. Amazonas y NN", "0001"),
+    Sucursal("Sangolqui", "Av. General Enríquez", "0002"),
+    Sucursal("Cumbaya", "Plaza Cumbaya", "0003")
+};
+
 
 int leerUltimoIdCuenta() {
     // Primero verificamos si hay cuentas
@@ -85,6 +102,34 @@ double pedirMontoSeguro(const std::string& mensaje) {
     return std::stod(montoStr);
 }
 
+Sucursal seleccionarSucursal(const std::vector<Sucursal>& sucursales) {
+    int opcion = 0;
+    while (true) {
+        system("cls");
+        std::cout << "=== Seleccione la sucursal ===" << std::endl;
+        for (size_t i = 0; i < sucursales.size(); i++) {
+            if ((int)i == opcion)
+                std::cout << ">> " << sucursales[i].getNombre() << std::endl;
+            else
+                std::cout << "   " << sucursales[i].getNombre() << std::endl;
+        }
+        int tecla = _getch();
+        if (tecla == 224) {
+            tecla = _getch();
+            if (tecla == 72) { // Flecha arriba
+                if (opcion > 0) opcion--;
+                else opcion = sucursales.size() - 1;
+            } else if (tecla == 80) { // Flecha abajo
+                if (opcion < (int)sucursales.size() - 1) opcion++;
+                else opcion = 0;
+            }
+        } else if (tecla == 13) {
+            return sucursales[opcion];
+        }
+    }
+}
+
+
 // Imprime el menú y resalta la opción seleccionada
 void imprimirMenu(int opcionSeleccionada) {
     system("cls");
@@ -102,10 +147,11 @@ void imprimirMenu(int opcionSeleccionada) {
         "10. Ayuda",
         "11. Pico de acceso de usuario", // Nueva opción
         "12. Pico de transacciones de usuario",
-        "13. Calcular pago de sobregiro de una cuenta",
-        "14. Salir"
+        "13. Asignar cita para apertura de cuenta",
+        "14. Mostrar distancia de una cita especifica",
+        "15. Salir"
     };
-    for (int i = 0; i < 14; i++) {
+    for (int i = 0; i < 15; i++) {
         if (i == opcionSeleccionada)
             cout << ">> " << opciones[i] << endl;
         else
@@ -163,8 +209,9 @@ void menuTransacciones(Cuenta* cuenta) {
         "4. Mostrar historial",
         "5. Mostrar estado de sobregiro",
         "6. Calcular intereses de sobregiro",
-        "7. Regresar",
-        "8. Eliminar cuenta"
+        "7. Simular sobregiro",
+        "8. Regresar",
+        "9. Eliminar cuenta"
     };
     string opcionesAhorro[6] = {
         "1. Consultar saldo",
@@ -177,6 +224,36 @@ void menuTransacciones(Cuenta* cuenta) {
     bool regresar = false;
     bool cuentaEliminada = false;
     OperacionCuenta operacion(*cuenta);
+
+    if (cuenta->getSaldo() < 0) {
+        // Buscar la transacción de sobregiro más reciente para esta cuenta
+        Fecha fechaSobregiro;
+        bool encontrada = false;
+        NodoTransaccion<Transaccion>* actual = listaTransacciones.getNodoCabeza();
+        if (actual) {
+            do {
+                Transaccion trans = actual->getDato();
+                if (trans.getCuenta().getIdCuenta() == cuenta->getIdCuenta() &&
+                    trans.getTipoTransaccion().getTipo().find("Retiro-corriente") != std::string::npos) {
+                    fechaSobregiro = trans.getFecha();
+                    encontrada = true;
+                }
+                actual = actual->getSiguiente();
+            } while (actual != listaTransacciones.getNodoCabeza());
+        }
+        if (encontrada) {
+            std::tm tmFecha = {};
+            tmFecha.tm_mday = fechaSobregiro.getDia();
+            tmFecha.tm_mon = fechaSobregiro.getMes() - 1;
+            tmFecha.tm_year = fechaSobregiro.getAnio() - 1900;
+            tmFecha.tm_hour = fechaSobregiro.getHora();
+            tmFecha.tm_min = fechaSobregiro.getMinutos();
+            tmFecha.tm_sec = fechaSobregiro.getSegundos();
+            std::time_t t = std::mktime(&tmFecha);
+
+            operacion.setFechaInicioSobregiro(t);
+        }
+    }
     while (!regresar && !cuentaEliminada) {
         system("cls");
         cout << "===== Menu de Transacciones =====" << endl;
@@ -190,7 +267,7 @@ void menuTransacciones(Cuenta* cuenta) {
         fechaActual.mostrarFechaHora();
         cout << endl;
 
-        for (int i = 0; i < (esCorriente ? 8 : 6); i++) {
+        for (int i = 0; i < (esCorriente ? 9 : 6); i++) {
             if ((esCorriente && i == opcion) || (!esCorriente && i == opcion))
                 cout << ">> " << (esCorriente ? opcionesCorriente[i] : opcionesAhorro[i]) << endl;
             else
@@ -203,9 +280,9 @@ void menuTransacciones(Cuenta* cuenta) {
                 if (opcion > 0)
                     opcion--;
                 else
-                    opcion = (esCorriente ? 7 : 5);
+                    opcion = (esCorriente ? 8 : 5);
             } else if (tecla == 80) { // Flecha abajo
-                if (opcion < (esCorriente ? 7 : 5))
+                if (opcion < (esCorriente ? 8 : 5))
                     opcion++;
                 else
                     opcion = 0;
@@ -433,10 +510,16 @@ void menuTransacciones(Cuenta* cuenta) {
                     }
 
                     case 6:
+                        system("cls");
+                        SimuladorSobregiro::calcularPagoSobregiro(cuenta);
+                        system("pause");
+                        break;
+
+                    case 7:
                         regresar = true;
                         break;
                         
-                    case 7: { // Eliminar cuenta
+                    case 8: { // Eliminar cuenta
                         int confirmOpcion = 0;
                         string opcionesConfirm[] = {"Confirmar eliminacion", "Regresar"};
                         bool confirmar = false;
@@ -536,13 +619,15 @@ void menuConsultasAvanzadas() {
         "3. Buscar cuenta por cedula",
         "4. Buscar transacciones por fecha",
         "5. Buscar transacciones por dato",
-        "6. Regresar"
+        "6. Buscar cuentas por sucursal",
+        "7. Buscar cuentas por fecha y sucursal",
+        "8. Regresar"
     };
     bool regresar = false;
     while (!regresar) {
         system("cls");
         cout << "===== Consultas Avanzadas =====" << endl;
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 8; i++) {
             if (i == opcion)
                 cout << ">> " << opciones[i] << endl;
             else
@@ -555,9 +640,9 @@ void menuConsultasAvanzadas() {
             if (opcion > 0)
                 opcion--;
             else
-                opcion = 5; // Si está en la primera opción, va a la última
+                opcion = 7; // Si está en la primera opción, va a la última
             } else if (tecla == 80) { // Flecha abajo
-            if (opcion < 5)
+            if (opcion < 7)
                 opcion++;
             else
             opcion = 0; // Si está en la última opción, va a la primera
@@ -587,6 +672,7 @@ void menuConsultasAvanzadas() {
                 case 2: { // Buscar por cedula
                     string cedula = Validar::pedirCedula();
                     listaCuentas.buscarCuentasPorCedula(cedula); // Debes implementar este método en ListaCuenta
+
                     system("pause");
                     break;
                 }
@@ -604,7 +690,20 @@ void menuConsultasAvanzadas() {
 
                     break;
                 }
-                case 5: // Regresar
+                case 5: { // Buscar cuentas por sucursal
+                    Sucursal sucursal = seleccionarSucursal(sucursales);
+                    listaCuentas.buscarCuentasPorSucursal(sucursal.getNombre()); // Debes implementar este método en ListaCuenta
+                    system("pause");
+                    break;
+                }
+                case 6: { 
+                    Fecha fecha = Validar::pedirFecha();
+                    Sucursal sucursal = seleccionarSucursal(sucursales);
+                    listaCuentas.buscarCuentasPorFechaYSucursal(fecha.getDia(), fecha.getMes(), fecha.getAnio(), sucursal.getNombre());
+                    system("pause");
+                    break;
+                }
+                case 7: // Regresar
                     regresar = true;
                     break;
             }
@@ -670,8 +769,8 @@ void generarBackupTransacciones() {
 }
 
 void abrirAyuda() {
-                    system("\"C:\\Users\\camev\\Desktop\\Proyecto-Banco-Estructuras-Parcial-FINAL\\Proyecto-Banco-Estructuras-Parcial-1\\abrirAyuda.exe\"");
-                }
+    system("\"C:\\Users\\anatu\\Documents\\Estructuras\\Proyecto Version 1.4\\Proyecto-Banco-Estructuras-Parcial-1\\abrirAyuda.exe\"");
+}
 
 void restaurarBackupTransacciones() {
     std::vector<std::string> backups1, backups2;
@@ -890,11 +989,54 @@ void menuOrdenarCuentas() {
     }
 }
 
+void calcularHashArchivo(const std::string& nombreArchivo) {
+    std::string comando = "CertUtil -hashfile \"" + nombreArchivo + "\" SHA256 > hash_temp.txt";
+    system(comando.c_str());
+
+    std::ifstream hashFile("hash_temp.txt");
+    std::string linea;
+    std::cout << "Hash SHA-256 del archivo " << nombreArchivo << ":\n";
+    int lineCount = 0;
+    while (std::getline(hashFile, linea)) {
+        lineCount++;
+        if (lineCount == 2) { // La segunda línea contiene el hash
+            std::cout << linea << std::endl;
+        }
+    }
+    hashFile.close();
+    std::remove("hash_temp.txt");
+}
+
+void guardarHashArchivo(const std::string& nombreArchivo) {
+    std::string comando = "CertUtil -hashfile \"" + nombreArchivo + "\" SHA256 > hash_temp.txt";
+    system(comando.c_str());
+
+    std::ifstream hashFile("hash_temp.txt");
+    std::string linea, hash;
+    int lineCount = 0;
+    while (std::getline(hashFile, linea)) {
+        lineCount++;
+        if (lineCount == 2) { // La segunda línea contiene el hash
+            hash = linea;
+            break;
+        }
+    }
+    hashFile.close();
+    std::remove("hash_temp.txt");
+
+    // Guardar el hash en un archivo .hash.txt junto al archivo cifrado
+    std::string hashFileName = nombreArchivo + ".hash.txt";
+    std::ofstream out(hashFileName);
+    out << "SHA-256: " << hash << std::endl;
+    out.close();
+}
+
 int main() {
     // Cargar cuentas desde el archivo si existe
     listaCuentas.cargarCuentasDesdeArchivo("cuentas.txt");
     listaTransacciones.cargarTransaccionesDesdeArchivo("transacciones.txt"); // Inicializa
-    
+    cargarCitasDesdeArchivo("citas.txt", sucursales);
+
     // Verificar si hay cuentas y establecer el contador adecuadamente
     if (!listaCuentas.getNodoCabeza()) {
         contadorId = 1; // Reiniciar el contador si no hay cuentas
@@ -914,9 +1056,9 @@ int main() {
                 if (opcion > 0)
                     opcion--;
                 else
-                    opcion = 13; // Ahora hay 12 opciones (0-11)
+                    opcion = 14; // Ahora hay 12 opciones (0-11)
             } else if (tecla == 80) {
-                if (opcion < 13)
+                if (opcion < 14)
                     opcion++;
                 else
                     opcion = 0;
@@ -927,12 +1069,47 @@ int main() {
                     int tipo = submenuTipoCuenta();
                     if (tipo == 2) // Regresar
                         break;
-                    system("cls");
+
+                    Sucursal sucursalSeleccionada = seleccionarSucursal(sucursales);
                     
                     string nombre, apellido, cedula;
 
-                    // Pedir cédula con validación (ya valida dentro del método)
                     cedula = Validar::pedirCedula();
+                    
+                    // Busca cita para este cliente en la sucursal seleccionada
+                    std::vector<Cita>& citasSucursal = citasPorSucursal[sucursalSeleccionada.getCodigo()];
+                    bool tieneCita = false;
+                    Fecha fechaCita;
+                    for (const auto& cita : citasSucursal) {
+                        if (cita.getCedula() == (cedula)) {
+                            tieneCita = true;
+                            fechaCita = cita.getFecha();
+                            break;
+                        }
+                    }
+
+                    Fecha fechaActual;
+                    fechaActual.inicializarConFechaActual();
+
+                    if (!tieneCita) {
+                        cout << "No tiene una cita asignada para apertura de cuenta en esta sucursal.\n";
+                        cout << "Por favor, solicite una cita antes de crear su cuenta.\n";
+                        system("pause");
+                        break;
+                    } else if (fechaActual < fechaCita) {
+                        cout << "Su cita para apertura de cuenta es el ";
+                        fechaCita.mostrarFechaHora();
+                        cout << ".\nPor favor, espere hasta la fecha y hora de su cita.\n";
+                        system("pause");
+                        break;
+                    }
+
+                    system("cls");
+                    // Pedir cédula con validación (ya valida dentro del método)
+                    cout << "Tiene una cita para apertura de cuenta en esta sucursal.\n";
+                    cout << "Fecha de la cita: ";
+                    fechaCita.mostrarFechaHora();
+                    cout << endl;
 
                     // Determinar tipo de cuenta
                     TipoCuenta tipoCuenta(tipo == 0 ? "ahorros" : "corriente");
@@ -962,15 +1139,25 @@ int main() {
 
                     Persona persona(cedula, nombre, apellido);
                     double saldoInicial = 0.0; // Saldo inicial en 0
-                    Cuenta cuenta(persona, saldoInicial, tipoCuenta);
+                    Cuenta cuenta(persona, saldoInicial, tipoCuenta, sucursalSeleccionada); // <-- Pasa el objeto Sucursal aquí
                     cuenta.setContrasena(contrasena);
                     listaCuentas.insertarCuenta(cuenta);
                     listaCuentas.guardarCuentasEnArchivo("cuentas.txt"); // Guardar solo después de insertar
                     guardarUltimoIdCuenta(contadorId - 1);
 
                     cout << "Cuenta creada exitosamente con ID: " << cuenta.getIdCuentaStr() << endl;
+                    cout << "Sucursal: " << cuenta.getSucursal().getNombre() << endl; // Muestra el nombre de la sucursal
                     cout << "Numero de cuenta bancario completo: " << cuenta.getNumeroCuentaCompleto() << endl;
                     cout << "Su contrasena bancaria es: " << contrasena << endl;
+                    
+                    // Eliminar la cita de la sucursal (por cédula)
+                    for (auto it = citasSucursal.begin(); it != citasSucursal.end(); ++it) {
+                        if (it->getCedula() == cedula) {
+                            citasSucursal.erase(it);
+                            break;
+                        }
+                    }
+                    guardarCitasEnArchivo("citas.txt");
 
                     system("pause");
                     break;
@@ -1058,9 +1245,15 @@ int main() {
                     std::string archivoOriginal = Validar::pedirNombreArchivoBackup(); 
                     std::string archivoCifrado = Validar::pedirNombreArchivoCifrado(); 
                     int clave = Validar::pedirClaveNumerica();
-                
+
                     CifradoCesar::cifrarArchivo(archivoOriginal, archivoCifrado, clave);
                     std::cout << "Archivo cifrado correctamente." << std::endl;
+
+                    // Guardar el hash del archivo cifrado
+                    guardarHashArchivo(archivoCifrado);
+
+                    std::cout << "Hash SHA-256 guardado en: " << archivoCifrado << ".hash.txt" << std::endl;
+
                     system("pause");
                     break;
                 }
@@ -1093,6 +1286,11 @@ int main() {
                     break;
                 case 10: { // Pico de acceso de usuario
                     system("cls");
+                    if (!listaCuentas.getNodoCabeza()) {
+                        cout << "No hay cuentas registradas en el sistema." << endl;
+                        system("pause");
+                        break;
+                    }
                     std::string cedula = Validar::pedirCedula();
                     AccesoUsuario::mostrarPicoAcceso(cedula);
                     system("pause");
@@ -1100,17 +1298,58 @@ int main() {
                 }
                 case 11: { // Pico de transacciones de usuario
                     system("cls");
+                    if (!listaCuentas.getNodoCabeza()) {
+                        cout << "No hay cuentas registradas en el sistema." << endl;
+                        system("pause");
+                        break;
+                    }
                     std::string idCuenta = Validar::pedirIdCuenta();
                     TransaccionesUsuario::mostrarPicoTransacciones(idCuenta);
                     system("pause");
                     break;
                 }
-                case 12: // Calcular pago de sobregiro de una cuenta
+                
+                case 12: { // Asignar cita para apertura de cuenta
+                    Sucursal sucursal = seleccionarSucursal(sucursales);
                     system("cls");
-                    SimuladorSobregiro::calcularPagoSobregiro(listaCuentas);
+                    std::string cedula = Validar::pedirCedula();
+
+                    bool yaTieneCita = false;
+                    for (const auto& par : citasPorSucursal) {
+                        for (const auto& cita : par.second) {
+                            if (cita.getCedula() == cedula) {
+                                yaTieneCita = true;
+                                break;
+                            }
+                        }
+                        if (yaTieneCita) break;
+                    }
+                    if (yaTieneCita) {
+                        std::cout << "Ya tiene una cita registrada en alguna sucursal. No puede agendar otra.\n";
+                        system("pause");
+                        break;
+                    }
+
+                    std::string cliente = Validar::pedirApellido() + " " + Validar::pedirNombre();
+                    Fecha fechaDeseada = Validar::pedirFecha(); // Debe incluir hora y minutos
+                    int intervalo = 30; // minutos entre citas
+                    fechaDeseada.inicializarConFechaActual();
+                    asignarCitaSucursal(sucursal, cliente, cedula, fechaDeseada, intervalo);
+                    guardarCitasEnArchivo("citas.txt");
+                    // Mostrar distancias entre citas de esa sucursal
+                    mostrarDistanciasEntreCitas(citasPorSucursal[sucursal.getCodigo()]);
+                    
                     system("pause");
                     break;
-                case 13: // Salir
+                }
+                case 13: { // Mostrar distancia D de una cita específica
+                    Sucursal sucursal = seleccionarSucursal(sucursales);
+                    Fecha fechaBuscada = Validar::pedirFecha();
+                    mostrarDistanciaBinariaEntreCitas(citasPorSucursal[sucursal.getCodigo()], fechaBuscada);
+                    system("pause");
+                    break;
+                }
+                case 14: // Salir
                     salir = true;
                     break;
             }

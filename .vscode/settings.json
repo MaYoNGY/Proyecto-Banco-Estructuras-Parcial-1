@@ -57,6 +57,8 @@
         "text_encoding": "cpp",
         "typeinfo": "cpp",
         "variant": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "transacciones_backup_2025_06_23_04_28_46_cifrado": "cpp",
+        "map": "cpp"
     }
 }

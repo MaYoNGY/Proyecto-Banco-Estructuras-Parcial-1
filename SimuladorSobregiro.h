@@ -9,21 +9,17 @@
 
 class SimuladorSobregiro {
 public:
-    static void calcularPagoSobregiro(ListaCuenta<Cuenta>& listaCuentas) {
+    static void calcularPagoSobregiro(Cuenta* cuenta) {
         system("cls");
-        std::string idCuenta = Validar::pedirIdCuenta();
-        Cuenta* cuenta = listaCuentas.buscarCuentaPorId(idCuenta);
 
         if (!cuenta) {
-            std::cout << "Cuenta no encontrada." << std::endl;
-
+            std::cout << "Cuenta no válida." << std::endl;
             return;
         }
 
         double saldo = cuenta->getSaldo();
         if (saldo >= 0) {
             std::cout << "La cuenta no tiene sobregiro (saldo negativo)." << std::endl;
-
             return;
         }
 
@@ -31,7 +27,6 @@ public:
         int plazoMeses = Validar::pedirPlazoMeses();
         double tasaAnual = Validar::pedirTasaAnual();
         std::cout << "Monto de sobregiro: $" << montoSobregiro << std::endl;
-        
 
         double r = tasaAnual / 12.0 / 100.0; // tasa mensual
 
@@ -55,7 +50,6 @@ public:
         std::cout << "La cuota mensual minima para saldar el sobregiro es: $" << cuotaMinima << std::endl;
         std::cout << "Total pagado: $" << cuotaMinima * plazoMeses << std::endl;
         std::cout << "Intereses pagados: $" << (cuotaMinima * plazoMeses - montoSobregiro) << std::endl;
-
     }
 };
 

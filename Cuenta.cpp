@@ -1,6 +1,7 @@
 #include "Cuenta.h"
 #include <iostream>
 #include <sstream>
+#include <conio.h> // Para _getch()
 #include <set>
 #include <cctype>
 #include <string>
@@ -15,22 +16,29 @@ void Cuenta::generarIdCuenta() {
     std::ostringstream oss;
     oss << std::setw(10) << std::setfill('0') << contadorId++;
     idCuenta = oss.str();
-    
-    // Generar el número de cuenta completo con formato ecuatoriano
+
     std::string codigoPais = "EC";
-    std::string codigoEntidad = "0001";
-    std::string codigoOficina = "0001";
-    
-    // Cálculo simple de dígitos de control
+    std::string codigoEntidad = "2112";
+    std::string codigoSucursal = sucursal.getCodigo().empty() ? "0001" : sucursal.getCodigo();
+
+    // Cálculo del dígito de control usando módulo 11
+    // Ponderaciones típicas: 2,3,4,5,6,7,2,3,4,5 (de derecha a izquierda)
+    int ponderaciones[10] = {2,3,4,5,6,7,2,3,4,5};
     int suma = 0;
-    for (char c : idCuenta) suma += c - '0';
-    int digitoControl = suma % 100;
-    
+    for (int i = 0; i < 10; ++i) {
+        int digito = idCuenta[9 - i] - '0'; // de derecha a izquierda
+        suma += digito * ponderaciones[i];
+    }
+    int digitoControl = 11 - (suma % 11);
+    if (digitoControl == 11) digitoControl = 0;
+    if (digitoControl == 10) digitoControl = 1;
+
     std::ostringstream ossCompleto;
-    ossCompleto << codigoPais << codigoEntidad << codigoOficina
-               << std::setw(2) << std::setfill('0') << digitoControl
-               << idCuenta;
-    
+    ossCompleto << codigoPais << std::setw(2) << std::setfill('0') << digitoControl 
+                << codigoEntidad << codigoSucursal
+                << std::setw(2) << std::setfill('0') << digitoControl
+                << idCuenta;
+
     numeroCuentaCompleto = ossCompleto.str();
 }
 
@@ -74,9 +82,9 @@ void Cuenta::setSaldo(double newSaldo) {
 }
 
 // Constructor corregido: NO recibe id, el id se genera con generarIdCuenta()
-Cuenta::Cuenta(const Persona& persona, double saldo, TipoCuenta tipo)
-    : persona(persona), saldo(saldo), tipo(tipo) {
-    generarIdCuenta();  // Esto ya establece idCuenta y numeroCuentaCompleto
+Cuenta::Cuenta(const Persona& persona, double saldo, TipoCuenta tipo, const Sucursal& sucursal)
+    : persona(persona), saldo(saldo), tipo(tipo), sucursal(sucursal) {
+    generarIdCuenta();
     fechaCreacion.inicializarConFechaActual();
 }
 
@@ -113,4 +121,12 @@ std::string Cuenta::getNumeroCuentaCompleto() const {
 
 void Cuenta::setNumeroCuentaCompleto(const std::string& numero) {
     numeroCuentaCompleto = numero;
+}
+
+void Cuenta::setSucursal(const Sucursal& s) {
+    sucursal = s;
+}
+
+Sucursal Cuenta::getSucursal() const {
+    return sucursal;
 }
